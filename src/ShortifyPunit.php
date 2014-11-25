@@ -1,11 +1,5 @@
 <?php
 namespace ShortifyPunit;
-use Exception;
-use ReflectionClass;
-use ReflectionException;
-use ReflectionMethod;
-use ReflectionParameter;
-
 
 // Identifying mocks
 interface ShortifyPunit_Mock_Interface
@@ -21,13 +15,13 @@ class ShortifyPunit
     public static function mock($mockedClass)
     {
         if ( ! class_exists($mockedClass) and ! interface_exists($mockedClass)) {
-            throw new Exception("Mocking failed `{$mockedClass}` No such class or interface");
+            throw new \Exception("Mocking failed `{$mockedClass}` No such class or interface");
         }
 
-        $reflection = new ReflectionClass($mockedClass);
+        $reflection = new \ReflectionClass($mockedClass);
 
         if ($reflection->isFinal()) {
-            throw new Exception("Unable to mock class {$mockedClass} declared as final");
+            throw new \Exception("Unable to mock class {$mockedClass} declared as final");
         }
 
         $basename = self::$classBasePrefix;
@@ -50,7 +44,7 @@ EOT;
 
         foreach ($methods as $method)
         {
-            if ( ! $method instanceof ReflectionMethod) {
+            if ( ! $method instanceof \ReflectionMethod) {
                 continue;
             }
 
@@ -69,7 +63,7 @@ EOT;
             // Get method params
             foreach ($method->getParameters() as $param)
             {
-                if ( ! $param instanceof ReflectionParameter) {
+                if ( ! $param instanceof \ReflectionParameter) {
                     continue;
                 }
 
@@ -88,7 +82,7 @@ EOT;
                 // Get default value if exists
                 try {
                     $paramDefaultValue = $param->getDefaultValue();
-                } catch (ReflectionException $e) {
+                } catch (\ReflectionException $e) {
                     $paramDefaultValue = NULL;
                 }
 
