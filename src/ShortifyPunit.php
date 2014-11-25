@@ -1,6 +1,5 @@
 <?php
 namespace ShortifyPunit;
-require_once 'Examples.php';
 
 trait ShortifyPunitExceptionFactory
 {
@@ -264,7 +263,7 @@ EOT;
                 self::throwException('Invalid method name!');
             }
 
-            $fakeClass = new ShortifyPunitClassOnTheFly();
+            $fakeClass = new MockClassOnTheFly();
 
             if ($lastClass === false)
             {
@@ -320,13 +319,13 @@ class ShortifyPunitWhenCase
                 $this->args = $args;
             }
             else {
-                ShortifyPunitExceptionFactory::throwException("`{$method}` method doesn't exist in {$this->className} !");
+                static::throwException("`{$method}` method doesn't exist in {$this->className} !");
             }
         }
         else
         {
             if ( ! isset($args[0])) {
-                ShortifyPunitExceptionFactory::throwException("Invalid call to ShortifyPunitWhenCase!");
+                static::throwException("Invalid call to ShortifyPunitWhenCase!");
             }
 
             $value = $args[0];
@@ -339,7 +338,7 @@ class ShortifyPunitWhenCase
                     break;
 
                 default:
-                    ShortifyPunitExceptionFactory::throwException("`{$method}` no such action!");
+                    static::throwException("`{$method}` no such action!");
                     break;
             }
         }
@@ -357,15 +356,24 @@ interface ShortifyPunitMockInterface
 {
 }
 
-class ShortifyPunitClassOnTheFly
+/**
+ * Class ShortifyPunitClassOnTheFly
+ * @package ShortifyPunit
+ * @desc used on `when_concat` function, creating anonymous functions on-the-fly
+ */
+class MockClassOnTheFly
 {
+    use ShortifyPunitExceptionFactory;
+
     private $methods = [];
 
     public function __call($key, $args)
     {
-        if (isset($this->methods[$key])) {
-            return call_user_func_array($this->methods[$key], $args);
+        if ( ! isset($this->methods[$key])) {
+            static::throwException("`{$key}` no such method!");
         }
+
+        return call_user_func_array($this->methods[$key], $args);
     }
 
     public function __set($key, $val)
@@ -373,19 +381,4 @@ class ShortifyPunitClassOnTheFly
         $this->methods[$key] = $val;
     }
 }
-
-
-$class = ShortifyPunit::mock('\SimpleClassForMocking');
-if ( ! $class instanceof \SimpleClassForMocking) {
-    die('Not instance of!');
-}
-ShortifyPunit::when($class)->first_method()->returns('wtf');
-ShortifyPunit::when($class)->first_method(1)->returns('wtf 1 ');
-ShortifyPunit::when($class)->first_method()->returns('wtf 2 ');
-
-ShortifyPunit::when_concat($class, array('first_method',
-                                        'second_method'),
-                           'abc');
-
-var_dump($class->first_method()->second_method());
 
