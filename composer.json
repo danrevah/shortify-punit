@@ -1,0 +1,23 @@
+{
+    "name": "danrevah/spu",
+    "description": "Simple PHP Mocking framework",
+    "require": {
+        "php": ">=5.4.0"
+    },
+    "homepage": "https://github.com/danrevah/ShortifyPunit",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Dan Revah",
+            "email": "danrevah89@gmail.com"
+        }
+    ],
+    "support": {
+        "issues": "https://github.com/danrevah/ShortifyPunit/issues",
+        "source": "https://github.com/danrevah/ShortifyPunit/"
+    },
+    "autoload": {
+        "psr-4": { "spu\\": "src/" }
+    },
+    "bin": ["bin/spu"]
+}
