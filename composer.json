@@ -17,6 +17,6 @@
         "source": "https://github.com/danrevah/ShortifyPunit/"
     },
     "autoload": {
-        "psr-4": { "spu\\": "src/" }
+        "psr-4": { "ShortifyPunit\\": "src/" }
     }
 }
