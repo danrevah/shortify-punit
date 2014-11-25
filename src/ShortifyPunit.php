@@ -6,7 +6,7 @@ class ShortifyPunit
     /**
      * @var int - Last mock instance id (Counter)
      */
-    private static $instanceId = 1;
+    public static $instanceId = 0;
 
     /**
      * @var string - Mocked classes base prefix
@@ -14,18 +14,16 @@ class ShortifyPunit
     private static $classBasePrefix = 'ShortifyPunit';
 
     /**
-     * @var array - return values of mocked functions by instance id 
+     * @var array - return values of mocked functions by instance id
      */
     private static $returnValues = [];
 
-    /**
-     * @desc Implementing allowed friend classes / interface in PHP
-     */
-    private static $friendClasses = ['ShortifyPunit\ShortifyPunit'];
 
     /**
      * Call static function is used to detect calls to protected & private methods
      * only friend classes are allowed to call private methods (C++ Style)
+     *
+     * + Friend Classes are those who Implement the mocking interface (ShortifyPunitMockInterface)
      *
      * @param $name
      * @param $arguments
@@ -41,8 +39,15 @@ class ShortifyPunit
 
         $backTrace = debug_backtrace();
 
-        if ( ! isset($backTrace[1]['class']) && in_array($backTrace[1]['class'], self::$friendClasses)) {
+        if ( ! isset($backTrace[2]['class'])) {
             self::throwException("Error while backtracking calling class");
+        }
+
+        $basename = $namespace = self::$classBasePrefix;
+        $reflection = new \ReflectionClass($backTrace[2]['class']);
+
+        if ( ! $reflection->implementsInterface("{$namespace}\\{$basename}MockInterface")) {
+            self::throwException("{$class} is not a friend class!");
         }
 
         return forward_static_call_array('static::'.$name, $arguments);
@@ -68,23 +73,35 @@ class ShortifyPunit
         }
 
         $namespace = $basename = self::$classBasePrefix;
-        $instanceId = self::$instanceId++;
-        $mockedObjectName = "{$basename}{$instanceId}";
+
+        $mockedNamespace = $reflection->getNamespaceName();
+        $mockedObjectName = $reflection->getShortName().'Mock';
 
         $className = $reflection->getName();
         $methods = $reflection->getMethods();
         $extends = $reflection->isInterface() ? 'implements' : 'extends';
         $marker = $reflection->isInterface() ? ", {$namespace}\\{$basename}MockInterface" : "implements {$namespace}\\{$basename}MockInterface";
 
-        //if (class_exists($mockedObjectName, FALSE)) {
-        //    return $mockedObjectName;
-        //}
 
+        $namespaceDeclaration = $mockedNamespace ? "namespace $mockedNamespace;" : '';
+        $mockerClass = $mockedNamespace.'\\'.$mockedObjectName;
+
+        // Prevent duplicate mocking, return new instance of the mocked class
+        if (class_exists($mockerClass, FALSE)) {
+            return new $mockerClass();
+        }
 
         $class =<<<EOT
+  $namespaceDeclaration
   class $mockedObjectName $extends $className $marker {
+   private \$mockInstanceId;
+
+   public function __construct() {
+        \$this->mockInstanceId = ++{$namespace}\\{$basename}::\$instanceId;
+   }
 EOT;
 
+        /* Mocking methods */
         foreach ($methods as $method)
         {
             if ( ! $method instanceof \ReflectionMethod) {
@@ -96,6 +113,11 @@ EOT;
                 continue;
             }
 
+            // Ignoring constructor (created earliar)
+            if ($method->name == '__construct') {
+                continue;
+            }
+
 
             $methodName = $method->getName();
             $returnsByReference = $method->returnsReference() ? '&' : '';
@@ -103,7 +125,7 @@ EOT;
             $methodParams = [];
             $callParams = [];
 
-            // Get method params
+            // Get method parameters
             foreach ($method->getParameters() as $param)
             {
                 if ( ! $param instanceof \ReflectionParameter) {
@@ -135,12 +157,12 @@ EOT;
             }
 
             $methodParams = implode(',', $methodParams);
-            $callParams = implode(',', $callParams);
+            //$callParams = implode(',', $callParams);
 
 
             $class .=<<<EOT
     public function $returnsByReference $methodName ({$methodParams}) {
-        return {$namespace}\\{$basename}::__create_response('{$mockedClass}', {$instanceId}, '{$methodName}', func_get_args());
+        return {$namespace}\\{$basename}::__create_response('{$mockedClass}', \$this->mockInstanceId, '{$methodName}', func_get_args());
     }
 EOT;
 
