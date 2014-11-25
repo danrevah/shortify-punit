@@ -6,7 +6,7 @@ class ShortifyPunit
     /**
      * @var int - Last mock instance id (Counter)
      */
-    public static $__instanceId = 0;
+    private static $instanceId = 0;
 
     /**
      * @var string - Mocked classes base prefix
@@ -94,11 +94,12 @@ class ShortifyPunit
         $class =<<<EOT
   $namespaceDeclaration
   class $mockedObjectName $extends $className $marker {
-   private \$mockInstanceId;
+   public \$mockInstanceId;
 
    public function __construct() {
-        \$this->mockInstanceId = ++{$namespace}\\{$basename}::\$__instanceId;
+        \$this->mockInstanceId = {$namespace}\\{$basename}::generateInstanceId();
    }
+
 EOT;
 
         /* Mocking methods */
@@ -113,7 +114,7 @@ EOT;
                 continue;
             }
 
-            // Ignoring constructor (created earliar)
+            // Ignoring constructor (created earlier)
             if ($method->name == '__construct') {
                 continue;
             }
@@ -186,6 +187,15 @@ EOT;
     {
         $exceptionClass = class_exists('\\PHPUnit_Framework_AssertionFailedError') ? '\\PHPUnit_Framework_AssertionFailedError' : '\\Exception';
         throw new $exceptionClass($exceptionString);
+    }
+
+    /**
+     * Generating instance id, function is called from mocked classes using `friend classes` style
+     * @return int
+     */
+    private static function generateInstanceId()
+    {
+        return ++self::$instanceId;
     }
 
     /**
