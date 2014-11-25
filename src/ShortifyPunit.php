@@ -1,5 +1,5 @@
 <?php
-namespace ShortifyPunit;
+namespace spu;
 
 trait ShortifyPunitExceptionFactory
 {
@@ -29,6 +29,11 @@ class ShortifyPunit
     private static $classBasePrefix = 'ShortifyPunit';
 
     /**
+     * @var string - Current namespace
+     */
+    private static $namespace = 'spu';
+
+    /**
      * @var array - return values of mocked functions by instance id
      */
     private static $returnValues = [];
@@ -36,7 +41,7 @@ class ShortifyPunit
     /**
      * @var array of allowed friend classes, that could access private methods of this class
      */
-    private static $friendClasses = ['ShortifyPunit\ShortifyPunitWhenCase'];
+    private static $friendClasses = ['spu\ShortifyPunitWhenCase'];
 
     /**
      * Call static function is used to detect calls to protected & private methods
@@ -63,7 +68,9 @@ class ShortifyPunit
             self::throwException("Error while backtracking calling class");
         }
 
-        $basename = $namespace = self::$classBasePrefix;
+        $basename = self::$classBasePrefix;
+        $namespace = self::$namespace;
+
         $reflection = new \ReflectionClass($backTrace[2]['class']);
 
         if ( ! $reflection->implementsInterface("{$namespace}\\{$basename}MockInterface") &&
@@ -95,7 +102,8 @@ class ShortifyPunit
             self::throwException("Unable to mock class {$mockedClass} declared as final");
         }
 
-        $namespace = $basename = self::$classBasePrefix;
+        $basename = self::$classBasePrefix;
+        $namespace = self::$namespace;
 
         $mockedNamespace = $reflection->getNamespaceName();
         $mockedObjectName = $reflection->getShortName().'Mock';
