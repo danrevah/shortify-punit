@@ -1,5 +1,5 @@
 <?php
-namespace spu;
+namespace ShortifyPunit;
 
 trait ShortifyPunitExceptionFactory
 {
@@ -31,7 +31,7 @@ class ShortifyPunit
     /**
      * @var string - Current namespace
      */
-    private static $namespace = 'spu';
+    private static $namespace = 'ShortifyPunit';
 
     /**
      * @var array - return values of mocked functions by instance id
@@ -41,7 +41,7 @@ class ShortifyPunit
     /**
      * @var array of allowed friend classes, that could access private methods of this class
      */
-    private static $friendClasses = ['spu\ShortifyPunitWhenCase'];
+    private static $friendClasses = ['ShortifyPunit\ShortifyPunitWhenCase'];
 
     /**
      * Call static function is used to detect calls to protected & private methods

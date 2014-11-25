@@ -3,7 +3,7 @@
 require_once dirname(dirname(__FILE__)).'/src/ShortifyPunit.php';
 require_once dirname(__FILE__).'/TestClasses.php';
 
-use spu\ShortifyPunit;
+use ShortifyPunit\ShortifyPunit;
 
 class ShortifyPunitTest extends \PHPUnit_Framework_TestCase
 {
@@ -94,7 +94,7 @@ class ShortifyPunitTest extends \PHPUnit_Framework_TestCase
                                    'abc');
 
         // asserting that first method returns `MockClassOnTheFly` object
-        $this->assertInstanceOf('spu\MockClassOnTheFly', $mock->first_method());
+        $this->assertInstanceOf('ShortifyPunit\MockClassOnTheFly', $mock->first_method());
 
         // asserting concatenation
         $this->assertEquals('abc', $mock->first_method()->second_method());
