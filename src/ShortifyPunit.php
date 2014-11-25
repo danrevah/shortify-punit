@@ -33,6 +33,9 @@ class ShortifyPunit
      */
     private static $returnValues = [];
 
+    /**
+     * @var array of allowed friend classes, that could access private methods of this class
+     */
     private static $friendClasses = ['ShortifyPunit\ShortifyPunitWhenCase'];
 
     /**
@@ -195,6 +198,16 @@ EOT;
         return $mockObject;
     }
 
+    /**
+     * Setting up a mock response, function is called from mocked classes using `friend classes` style
+     *
+     * @param $className
+     * @param $instanceId
+     * @param $methodName
+     * @param $args
+     * @param $action
+     * @param $returns
+     */
     private static function setWhenMockResponse($className, $instanceId, $methodName, $args, $action, $returns)
     {
         $args = serialize($args);
@@ -242,6 +255,12 @@ EOT;
         return NULL;
     }
 
+    /**
+     * Setting up a when case
+     *
+     * @param $class
+     * @return ShortifyPunitWhenCase
+     */
     public static function when($class)
     {
         if ($class instanceof ShortifyPunitMockInterface) {
@@ -249,16 +268,27 @@ EOT;
         }
     }
 
+    /**
+     * Setting up a when concatenation case
+     * @param $class
+     * @param array $methods
+     * @param $value
+     */
     public static function when_concat($class, array $methods, $value)
     {
+        if (count($methods) < 2) {
+            self::throwException('When concat must get at least methods!');
+        }
+
         $reversedMethods = array_reverse($methods);
+
+        // pop out the last element (=first before using array_reverse)
+        $lastElement = array_pop($reversedMethods);
         $lastClass = false;
 
-        // Exit loop before the first element (last after reversed)
-        for ($i=0, $l=count($reversedMethods) - 1; $i<$l; ++$i)
+        // now after the array_pop this will loop only the functions without the first method
+        foreach ($reversedMethods as $method)
         {
-            $method = $reversedMethods[$i];
-
             if ( ! is_string($method)) {
                 self::throwException('Invalid method name!');
             }
@@ -283,13 +313,19 @@ EOT;
         }
 
         if ($class instanceof ShortifyPunitMockInterface) {
-            $whenCase = new ShortifyPunitWhenCase(get_class($class), $class->mockInstanceId, $methods[0]);
+            $whenCase = new ShortifyPunitWhenCase(get_class($class), $class->mockInstanceId, $lastElement);
             $whenCase->setMethod([], 'returns', $lastClass);
         }
 
     }
 }
 
+/**
+ * Class ShortifyPunitWhenCase
+ * @package ShortifyPunit
+ * @desc When Case, is used to set up mocking response using specific call arguments
+ *       and return action (throw exception, return value, ..)
+ */
 class ShortifyPunitWhenCase
 {
     use ShortifyPunitExceptionFactory;
@@ -381,4 +417,3 @@ class MockClassOnTheFly
         $this->methods[$key] = $val;
     }
 }
-

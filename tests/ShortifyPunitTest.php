@@ -51,9 +51,27 @@ class ShortifyPunitTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * Mock instance id value
+     *
+     * @checks instance id of mocks are increasing properly
+     * @expects counter to increase after each mock so there will be no identical instance id
+     */
+    public function testInstanceIdOfMocks()
+    {
+        $mock = ShortifyPunit::mock('SimpleClassForMocking');
+        $instanceId = $mock->mockInstanceId;
+
+        $mockTwo = ShortifyPunit::mock('SimpleClassForMocking');
+        $mockThree = ShortifyPunit::mock('SimpleClassForMocking');
+
+        $this->assertEquals($instanceId+1, $mockTwo->mockInstanceId);
+        $this->assertEquals($instanceId+2, $mockThree->mockInstanceId);
+    }
+
+    /**
      * Testing concatenation of functions
      *
-     * @checks return values of concatenated functions, and checking that expect of the first function
+     * @checks return values of concatenation functions, and checking that expect of the first function
      * no other function has been manipulated so the user could mock other values in case of direct call
      */
     public function testWhenConcatenation()
@@ -75,5 +93,35 @@ class ShortifyPunitTest extends \PHPUnit_Framework_TestCase
 
         // checking that second_method wasn't changed due to concatenation
         $this->assertEquals('second', $mock->second_method());
+    }
+
+    /**
+     * @expectedException \PHPUnit_Framework_AssertionFailedError
+     */
+    public function testWhenConcatenationMinimumMethod()
+    {
+        $mock = ShortifyPunit::mock('SimpleClassForMocking');
+
+        ShortifyPunit::when_concat($mock, array('first_method'), 'abc');
+    }
+
+    /**
+     * @expectedException \PHPUnit_Framework_AssertionFailedError
+     */
+    public function testWhenConcatenationFakeMethodName()
+    {
+        $mock = ShortifyPunit::mock('SimpleClassForMocking');
+
+        ShortifyPunit::when_concat($mock, array('fake method name'), 'abc');
+    }
+
+    /**
+     * @expectedException \PHPUnit_Framework_AssertionFailedError
+     */
+    public function testWhenConcatenationMethodNotString()
+    {
+        $mock = ShortifyPunit::mock('SimpleClassForMocking');
+
+        ShortifyPunit::when_concat($mock, array(1, 2), 'abc');
     }
 }
