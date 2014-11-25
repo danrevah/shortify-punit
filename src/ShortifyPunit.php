@@ -1,22 +1,14 @@
 <?php
 namespace ShortifyPunit;
 
-trait ShortifyPunitExceptionFactory
-{
-    /**
-     * Throwing PHPUnit Assert Exception if exists otherwise throwing regular PHP Exception
-     * @param $exceptionString
-     */
-    protected static function throwException($exceptionString)
-    {
-        $exceptionClass = class_exists('\\PHPUnit_Framework_AssertionFailedError') ? '\\PHPUnit_Framework_AssertionFailedError' : '\\Exception';
-        throw new $exceptionClass($exceptionString);
-    }
-}
+use spu\Exceptions\ExceptionFactory;
+use spu\ShortifyPunitMockInterface;
+use spu\ShortifyPunitWhenCase;
+use spu\ShortifyPunitMockClassOnTheFly;
 
 class ShortifyPunit
 {
-    use ShortifyPunitExceptionFactory;
+    use ExceptionFactory;
 
     /**
      * @var int - Last mock instance id (Counter)
@@ -301,7 +293,7 @@ EOT;
                 self::throwException('Invalid method name!');
             }
 
-            $fakeClass = new MockClassOnTheFly();
+            $fakeClass = new ShortifyPunitMockClassOnTheFly();
 
             if ($lastClass === false)
             {
@@ -325,103 +317,5 @@ EOT;
             $whenCase->setMethod([], 'returns', $lastClass);
         }
 
-    }
-}
-
-/**
- * Class ShortifyPunitWhenCase
- * @package ShortifyPunit
- * @desc When Case, is used to set up mocking response using specific call arguments
- *       and return action (throw exception, return value, ..)
- */
-class ShortifyPunitWhenCase
-{
-    use ShortifyPunitExceptionFactory;
-
-    private $className;
-    private $method;
-    private $args;
-
-    public function __construct($className, $instanceId, $method = '')
-    {
-        $this->className = $className;
-        $this->instanceId = $instanceId;
-        $this->method = $method;
-    }
-
-    public function setMethod($args, $action, $returns)
-    {
-        ShortifyPunit::setWhenMockResponse($this->className, $this->instanceId, $this->method, $args, $action, $returns);
-    }
-
-    public function __call($method, $args)
-    {
-        if (empty($this->method))
-        {
-            if (method_exists($this->className, $method)) {
-                $this->method = $method;
-                $this->args = $args;
-            }
-            else {
-                static::throwException("`{$method}` method doesn't exist in {$this->className} !");
-            }
-        }
-        else
-        {
-            if ( ! isset($args[0])) {
-                static::throwException("Invalid call to ShortifyPunitWhenCase!");
-            }
-
-            $value = $args[0];
-
-            switch($method)
-            {
-                case 'throws':
-                case 'returns':
-                    $this->setMethod($this->args, $method, $value);
-                    break;
-
-                default:
-                    static::throwException("`{$method}` no such action!");
-                    break;
-            }
-        }
-
-        return $this;
-    }
-}
-
-/**
- * Interface ShortifyPunitMockInterface
- * @package ShortifyPunit
- * @desc interface for mocked classes & interfaces
- */
-interface ShortifyPunitMockInterface
-{
-}
-
-/**
- * Class ShortifyPunitClassOnTheFly
- * @package ShortifyPunit
- * @desc used on `when_concat` function, creating anonymous functions on-the-fly
- */
-class MockClassOnTheFly
-{
-    use ShortifyPunitExceptionFactory;
-
-    private $methods = [];
-
-    public function __call($key, $args)
-    {
-        if ( ! isset($this->methods[$key])) {
-            static::throwException("`{$key}` no such method!");
-        }
-
-        return call_user_func_array($this->methods[$key], $args);
-    }
-
-    public function __set($key, $val)
-    {
-        $this->methods[$key] = $val;
     }
 }
