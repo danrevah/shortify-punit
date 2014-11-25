@@ -1,8 +1,24 @@
 <?php
 namespace ShortifyPunit;
+require_once 'Examples.php';
+
+trait ShortifyPunitExceptionFactory
+{
+    /**
+     * Throwing PHPUnit Assert Exception if exists otherwise throwing regular PHP Exception
+     * @param $exceptionString
+     */
+    protected static function throwException($exceptionString)
+    {
+        $exceptionClass = class_exists('\\PHPUnit_Framework_AssertionFailedError') ? '\\PHPUnit_Framework_AssertionFailedError' : '\\Exception';
+        throw new $exceptionClass($exceptionString);
+    }
+}
 
 class ShortifyPunit
 {
+    use ShortifyPunitExceptionFactory;
+
     /**
      * @var int - Last mock instance id (Counter)
      */
@@ -18,12 +34,14 @@ class ShortifyPunit
      */
     private static $returnValues = [];
 
+    private static $friendClasses = ['ShortifyPunit\ShortifyPunitWhenCase'];
 
     /**
      * Call static function is used to detect calls to protected & private methods
      * only friend classes are allowed to call private methods (C++ Style)
      *
      * + Friend Classes are those who Implement the mocking interface (ShortifyPunitMockInterface)
+     *   or is set in $friendClasses variable
      *
      * @param $name
      * @param $arguments
@@ -46,7 +64,9 @@ class ShortifyPunit
         $basename = $namespace = self::$classBasePrefix;
         $reflection = new \ReflectionClass($backTrace[2]['class']);
 
-        if ( ! $reflection->implementsInterface("{$namespace}\\{$basename}MockInterface")) {
+        if ( ! $reflection->implementsInterface("{$namespace}\\{$basename}MockInterface") &&
+             ! in_array($backTrace[2]['class'], self::$friendClasses))
+        {
             self::throwException("{$class} is not a friend class!");
         }
 
@@ -62,6 +82,7 @@ class ShortifyPunit
      */
     public static function mock($mockedClass)
     {
+
         if ( ! class_exists($mockedClass) and ! interface_exists($mockedClass)) {
             self::throwException("Mocking failed `{$mockedClass}` No such class or interface");
         }
@@ -133,9 +154,6 @@ EOT;
                     continue;
                 }
 
-                // Get params
-                $callParams[] = '$'.$param->getName();
-
                 // Get type hinting
                 if ($param->isArray()) {
                     $type = 'array ';
@@ -158,12 +176,11 @@ EOT;
             }
 
             $methodParams = implode(',', $methodParams);
-            //$callParams = implode(',', $callParams);
 
 
             $class .=<<<EOT
     public function $returnsByReference $methodName ({$methodParams}) {
-        return {$namespace}\\{$basename}::__create_response('{$mockedClass}', \$this->mockInstanceId, '{$methodName}', func_get_args());
+        return {$namespace}\\{$basename}::__create_response('{$mockedObjectName}', \$this->mockInstanceId, '{$methodName}', func_get_args());
     }
 EOT;
 
@@ -179,14 +196,11 @@ EOT;
         return $mockObject;
     }
 
-    /**
-     * Throwing PHPUnit Assert Exception if exists otherwise throwing regular PHP Exception
-     * @param $exceptionString
-     */
-    private static function throwException($exceptionString)
+    private static function setWhenMockResponse($className, $instanceId, $methodName, $args, $action, $returns)
     {
-        $exceptionClass = class_exists('\\PHPUnit_Framework_AssertionFailedError') ? '\\PHPUnit_Framework_AssertionFailedError' : '\\Exception';
-        throw new $exceptionClass($exceptionString);
+        $args = serialize($args);
+
+        self::$returnValues[$className][$instanceId][$methodName][$args] = ['action' => $action, 'value' => $returns];
     }
 
     /**
@@ -210,13 +224,128 @@ EOT;
      */
     private static function __create_response($className, $instanceId, $methodName, $args)
     {
-        if (isset(self::$returnValues[$className][$instanceId][$methodName][$args])) {
-            return self::$returnValues[$className][$instanceId][$methodName][$args];
+        $args = serialize($args);
+
+
+        if (isset(self::$returnValues[$className][$instanceId][$methodName][$args]))
+        {
+            $return = self::$returnValues[$className][$instanceId][$methodName][$args];
+
+            if ($return['action'] == 'returns') {
+                return $return['value'];
+            }
+
+            if ($return['action'] == 'throws') {
+                throw is_object($return['value']) ? $return['value'] : new $return['value'];
+            }
         }
 
         return NULL;
     }
 
+    public static function when($class)
+    {
+        if ($class instanceof ShortifyPunitMockInterface) {
+            return new ShortifyPunitWhenCase(get_class($class), $class->mockInstanceId);
+        }
+    }
+
+    public static function when_concat($class, array $methods, $value)
+    {
+        $reversedMethods = array_reverse($methods);
+        $lastClass = false;
+
+        // Exit loop before the first element (last after reversed)
+        for ($i=0, $l=count($reversedMethods) - 1; $i<$l; ++$i)
+        {
+            $method = $reversedMethods[$i];
+
+            if ( ! is_string($method)) {
+                self::throwException('Invalid method name!');
+            }
+
+            $fakeClass = new ShortifyPunitClassOnTheFly();
+
+            if ($lastClass === false)
+            {
+                // @todo Don't forget to handle arguments with func get args
+                $fakeClass->$method = function() use ($value) {
+                    return $value;
+                };
+            }
+            else
+            {
+                $fakeClass->$method = function() use ($lastClass) {
+                  return $lastClass;
+                };
+            }
+
+            $lastClass = $fakeClass;
+        }
+
+        if ($class instanceof ShortifyPunitMockInterface) {
+            $whenCase = new ShortifyPunitWhenCase(get_class($class), $class->mockInstanceId, $methods[0]);
+            $whenCase->setMethod([], 'returns', $lastClass);
+        }
+
+    }
+}
+
+class ShortifyPunitWhenCase
+{
+    use ShortifyPunitExceptionFactory;
+
+    private $className;
+    private $method;
+    private $args;
+
+    public function __construct($className, $instanceId, $method = '')
+    {
+        $this->className = $className;
+        $this->instanceId = $instanceId;
+        $this->method = $method;
+    }
+
+    public function setMethod($args, $action, $returns)
+    {
+        ShortifyPunit::setWhenMockResponse($this->className, $this->instanceId, $this->method, $args, $action, $returns);
+    }
+
+    public function __call($method, $args)
+    {
+        if (empty($this->method))
+        {
+            if (method_exists($this->className, $method)) {
+                $this->method = $method;
+                $this->args = $args;
+            }
+            else {
+                ShortifyPunitExceptionFactory::throwException("`{$method}` method doesn't exist in {$this->className} !");
+            }
+        }
+        else
+        {
+            if ( ! isset($args[0])) {
+                ShortifyPunitExceptionFactory::throwException("Invalid call to ShortifyPunitWhenCase!");
+            }
+
+            $value = $args[0];
+
+            switch($method)
+            {
+                case 'throws':
+                case 'returns':
+                    $this->setMethod($this->args, $method, $value);
+                    break;
+
+                default:
+                    ShortifyPunitExceptionFactory::throwException("`{$method}` no such action!");
+                    break;
+            }
+        }
+
+        return $this;
+    }
 }
 
 /**
@@ -228,9 +357,35 @@ interface ShortifyPunitMockInterface
 {
 }
 
-$class = ShortifyPunit::mock('Exception');
-if ( ! $class instanceof \Exception) {
-    die('Not instance of Exception!');
+class ShortifyPunitClassOnTheFly
+{
+    private $methods = [];
+
+    public function __call($key, $args)
+    {
+        if (isset($this->methods[$key])) {
+            return call_user_func_array($this->methods[$key], $args);
+        }
+    }
+
+    public function __set($key, $val)
+    {
+        $this->methods[$key] = $val;
+    }
 }
-var_dump($class->__toString());
+
+
+$class = ShortifyPunit::mock('\SimpleClassForMocking');
+if ( ! $class instanceof \SimpleClassForMocking) {
+    die('Not instance of!');
+}
+ShortifyPunit::when($class)->first_method()->returns('wtf');
+ShortifyPunit::when($class)->first_method(1)->returns('wtf 1 ');
+ShortifyPunit::when($class)->first_method()->returns('wtf 2 ');
+
+ShortifyPunit::when_concat($class, array('first_method',
+                                        'second_method'),
+                           'abc');
+
+var_dump($class->first_method()->second_method());
 
