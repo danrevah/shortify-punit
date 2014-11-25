@@ -1,16 +1,32 @@
 <?php
 namespace ShortifyPunit;
 
-// Identifying mocks
-interface ShortifyPunit_Mock_Interface
-{
-}
-
 class ShortifyPunit
 {
     private static $instanceId = 1;
     private static $classBasePrefix = 'ShortifyPunit';
     private static $returnValues = [];
+
+    public static function __callStatic($name, $arguments)
+    {
+        $class = get_called_class();
+
+        if ( ! method_exists($class, $name)) {
+            self::throwException("{$class} has no such method!");
+        }
+            $reflection = new \ReflectionMethod($class, $name);
+
+            if ($reflection->isPublic()) {
+
+            }
+
+        }
+    }
+
+    private static function throwException($exceptionString)
+    {
+        if (class_exists(PHPUnit))
+    }
 
     public static function mock($mockedClass)
     {
@@ -31,7 +47,7 @@ class ShortifyPunit
         $className = $reflection->getName();
         $methods = $reflection->getMethods();
         $extends = $reflection->isInterface() ? 'implements' : 'extends';
-        $marker = $reflection->isInterface() ? ", {$namespace}\\{$basename}_Mock_Interface" : "implements {$namespace}\\{$basename}_Mock_Interface";
+        $marker = $reflection->isInterface() ? ", {$namespace}\\{$basename}MockInterface" : "implements {$namespace}\\{$basename}MockInterface";
 
         //if (class_exists($mockedObjectName, FALSE)) {
         //    return $mockedObjectName;
@@ -101,8 +117,6 @@ EOT;
     }
 EOT;
 
-
-
         }
 
         $class .= '}';
@@ -125,6 +139,11 @@ EOT;
     }
 
    // public static function when()
+}
+
+// Identifying mocks
+interface ShortifyPunitMockInterface
+{
 }
 
 $class = ShortifyPunit::mock('Exception');
