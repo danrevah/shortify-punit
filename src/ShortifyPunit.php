@@ -24,14 +24,14 @@ class ShortifyPunit
             throw new \Exception("Unable to mock class {$mockedClass} declared as final");
         }
 
-        $basename = self::$classBasePrefix;
+        $namespace = $basename = self::$classBasePrefix;
         $instanceId = self::$instanceId++;
         $mockedObjectName = "{$basename}{$instanceId}";
 
         $className = $reflection->getName();
         $methods = $reflection->getMethods();
         $extends = $reflection->isInterface() ? 'implements' : 'extends';
-        $marker = $reflection->isInterface() ? ", {$basename}_Mock_Interface" : "implements {$basename}_Mock_Interface";
+        $marker = $reflection->isInterface() ? ", {$namespace}\\{$basename}_Mock_Interface" : "implements {$namespace}\\{$basename}_Mock_Interface";
 
         //if (class_exists($mockedObjectName, FALSE)) {
         //    return $mockedObjectName;
@@ -97,7 +97,7 @@ EOT;
 
             $class .=<<<EOT
     public function $returnsByReference $methodName ({$methodParams}) {
-        return {$basename}::__create_response('{$mockedClass}', {$instanceId}, '{$methodName}', func_get_args());
+        return {$namespace}\\{$basename}::__create_response('{$mockedClass}', {$instanceId}, '{$methodName}', func_get_args());
     }
 EOT;
 
@@ -107,12 +107,12 @@ EOT;
 
         $class .= '}';
 
+
         eval($class);
-$x = ('\\'.$mockedObjectName);
-        $mockObject = new $x();
+
+        $mockObject = new $mockedObjectName();
 
         return $mockObject;
-
     }
 
     public static function __create_response($className, $instanceId, $methodName, $args)
