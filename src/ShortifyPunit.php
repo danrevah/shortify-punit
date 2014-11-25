@@ -6,7 +6,7 @@ class ShortifyPunit
     /**
      * @var int - Last mock instance id (Counter)
      */
-    public static $instanceId = 0;
+    public static $__instanceId = 0;
 
     /**
      * @var string - Mocked classes base prefix
@@ -97,7 +97,7 @@ class ShortifyPunit
    private \$mockInstanceId;
 
    public function __construct() {
-        \$this->mockInstanceId = ++{$namespace}\\{$basename}::\$instanceId;
+        \$this->mockInstanceId = ++{$namespace}\\{$basename}::\$__instanceId;
    }
 EOT;
 
