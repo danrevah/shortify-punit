@@ -31,6 +31,14 @@ class ShortifyPunitTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('SimpleClassForMocking', $mock);
     }
 
+    public function testStubbingNullIfNotSet()
+    {
+        $mock = ShortifyPunit::mock('SimpleClassForMocking');
+
+        $this->assertNull($mock->first_method());
+        $this->assertNull($mock->second_method());
+    }
+
     /**
      * Mock return values test
      * @checks return values of several mocks
