@@ -1,4 +1,4 @@
-{
+{ 
     "name": "danrevah/spu",
     "description": "Simple PHP Mocking framework",
     "require": {
