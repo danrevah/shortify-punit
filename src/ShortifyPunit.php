@@ -3,15 +3,34 @@ namespace ShortifyPunit;
 
 class ShortifyPunit
 {
+    /**
+     * @var int - Last mock instance id (Counter)
+     */
     private static $instanceId = 1;
+
+    /**
+     * @var string - Mocked classes base prefix
+     */
     private static $classBasePrefix = 'ShortifyPunit';
+
+    /**
+     * @var array - return values of mocked functions by instance id 
+     */
     private static $returnValues = [];
 
     /**
      * @desc Implementing allowed friend classes / interface in PHP
      */
-    private static $friendClasses = ['ShortifyPunitMockInterface'];
+    private static $friendClasses = ['ShortifyPunit\ShortifyPunit'];
 
+    /**
+     * Call static function is used to detect calls to protected & private methods
+     * only friend classes are allowed to call private methods (C++ Style)
+     *
+     * @param $name
+     * @param $arguments
+     * @return mixed
+     */
     public static function __callStatic($name, $arguments)
     {
         $class = get_called_class();
@@ -20,27 +39,32 @@ class ShortifyPunit
             self::throwException("{$class} has no such method!");
         }
 
-        $reflection = new \ReflectionMethod($class, $name);
+        $backTrace = debug_backtrace();
 
-        if ($reflection->isPublic()) {
-            forward_static_call_array(array($class, $name), $arguments);
-        } else if ($reflection->isPrivate() && in_array()) {
-            $backTrace = debug_backtrace();
-            print_r($backTrace);
-            die;
+        if ( ! isset($backTrace[1]['class']) && in_array($backTrace[1]['class'], self::$friendClasses)) {
+            self::throwException("Error while backtracking calling class");
         }
+
+        return forward_static_call_array('static::'.$name, $arguments);
     }
 
+    /**
+     * Mocking interfaces|classes
+     * - Ignoring final and private methods
+     *
+     * @param $mockedClass
+     * @return mixed
+     */
     public static function mock($mockedClass)
     {
         if ( ! class_exists($mockedClass) and ! interface_exists($mockedClass)) {
-            throw new \Exception("Mocking failed `{$mockedClass}` No such class or interface");
+            self::throwException("Mocking failed `{$mockedClass}` No such class or interface");
         }
 
         $reflection = new \ReflectionClass($mockedClass);
 
         if ($reflection->isFinal()) {
-            throw new \Exception("Unable to mock class {$mockedClass} declared as final");
+            self::throwException("Unable to mock class {$mockedClass} declared as final");
         }
 
         $namespace = $basename = self::$classBasePrefix;
@@ -132,13 +156,27 @@ EOT;
         return $mockObject;
     }
 
+    /**
+     * Throwing PHPUnit Assert Exception if exists otherwise throwing regular PHP Exception
+     * @param $exceptionString
+     */
     private static function throwException($exceptionString)
     {
         $exceptionClass = class_exists('\\PHPUnit_Framework_AssertionFailedError') ? '\\PHPUnit_Framework_AssertionFailedError' : '\\Exception';
         throw new $exceptionClass($exceptionString);
     }
 
-    public static function __create_response($className, $instanceId, $methodName, $args)
+    /**
+     * Create response is a private method which is called from the Mocked classes using `friend classes` style
+     * returns a value which was set before in the When() function otherwise returning NULL
+     *
+     * @param $className
+     * @param $instanceId
+     * @param $methodName
+     * @param $args
+     * @return Mixed | null
+     */
+    private static function __create_response($className, $instanceId, $methodName, $args)
     {
         if (isset(self::$returnValues[$className][$instanceId][$methodName][$args])) {
             return self::$returnValues[$className][$instanceId][$methodName][$args];
@@ -147,10 +185,13 @@ EOT;
         return NULL;
     }
 
-   // public static function when()
 }
 
-// Identifying mocks
+/**
+ * Interface ShortifyPunitMockInterface
+ * @package ShortifyPunit
+ * @desc interface for mocked classes & interfaces
+ */
 interface ShortifyPunitMockInterface
 {
 }
