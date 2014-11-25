@@ -7,6 +7,11 @@ class ShortifyPunit
     private static $classBasePrefix = 'ShortifyPunit';
     private static $returnValues = [];
 
+    /**
+     * @desc Implementing allowed friend classes / interface in PHP
+     */
+    private static $friendClasses = ['ShortifyPunitMockInterface'];
+
     public static function __callStatic($name, $arguments)
     {
         $class = get_called_class();
@@ -14,18 +19,16 @@ class ShortifyPunit
         if ( ! method_exists($class, $name)) {
             self::throwException("{$class} has no such method!");
         }
-            $reflection = new \ReflectionMethod($class, $name);
 
-            if ($reflection->isPublic()) {
+        $reflection = new \ReflectionMethod($class, $name);
 
-            }
-
+        if ($reflection->isPublic()) {
+            forward_static_call_array(array($class, $name), $arguments);
+        } else if ($reflection->isPrivate() && in_array()) {
+            $backTrace = debug_backtrace();
+            print_r($backTrace);
+            die;
         }
-    }
-
-    private static function throwException($exceptionString)
-    {
-        if (class_exists(PHPUnit))
     }
 
     public static function mock($mockedClass)
@@ -127,6 +130,12 @@ EOT;
         $mockObject = new $mockedObjectName();
 
         return $mockObject;
+    }
+
+    private static function throwException($exceptionString)
+    {
+        $exceptionClass = class_exists('\\PHPUnit_Framework_AssertionFailedError') ? '\\PHPUnit_Framework_AssertionFailedError' : '\\Exception';
+        throw new $exceptionClass($exceptionString);
     }
 
     public static function __create_response($className, $instanceId, $methodName, $args)
