@@ -226,9 +226,11 @@ EOT;
         $reversedMethods = array_reverse($methods);
 
         // pop out the last element (=first before using array_reverse)
-        list($value, $key) = array(end($reversedMethods), key($reversedMethods));
-        $lastElement[$key] = $value;
+        list($value, $firstElementFunctionName) = array(end($reversedMethods), key($reversedMethods));
+        $firstElement[$firstElementFunctionName] = $value;
         array_pop($reversedMethods);
+
+        $returnValuesKey = "{$firstElementFunctionName}_Concatenation";
 
         $lastClass = false;
 
@@ -242,25 +244,28 @@ EOT;
             $fakeClass = new ShortifyPunitMockClassOnTheFly();
 
             // if this concatenated object method doesn't have already has an instance id, use it instead of re-creating
-            $instanceId = ( ! isset(self::$returnValues['Concatobject'][$method])) ? ++self::$instanceId : key(self::$returnValues['Concatobject'][$method]);
+            $instanceId = ( ! isset(self::$returnValues[$returnValuesKey][$method])) ? ++self::$instanceId : key(self::$returnValues[$returnValuesKey][$method]);
 
+            // if last function in the concatenation then the return value
             if ($lastClass === false) {
-                self::setWhenMockResponse('Concatobject', $instanceId, $method, $args, $returnType, $returnValue);
+                self::setWhenMockResponse($returnValuesKey, $instanceId, $method, $args, $returnType, $returnValue);
             }
+            // otherwise return the last MockOnTheFly class
             else {
-                self::setWhenMockResponse('Concatobject', $instanceId, $method, $args, $returnType, $lastClass);
+                self::setWhenMockResponse($returnValuesKey, $instanceId, $method, $args, $returnType, $lastClass);
             }
 
-            $fakeClass->$method = function() use ($returnValue, $args, $instanceId, $method) {
-                return ShortifyPunit::__create_response('Concatobject', $instanceId, $method, func_get_args());
+            // Create fake method 
+            $fakeClass->$method = function() use ($returnValue, $args, $instanceId, $method, $returnValuesKey) {
+                return ShortifyPunit::__create_response($returnValuesKey, $instanceId, $method, func_get_args());
             };
 
             $lastClass = $fakeClass;
         }
 
         if ($class instanceof ShortifyPunitMockInterface) {
-            $whenCase = new ShortifyPunitWhenCase(get_class($class), $class->mockInstanceId, key($lastElement));
-            $whenCase->setMethod(current($lastElement), 'returns', $lastClass);
+            $whenCase = new ShortifyPunitWhenCase(get_class($class), $class->mockInstanceId, key($firstElement));
+            $whenCase->setMethod(current($firstElement), 'returns', $lastClass);
         }
     }
 
