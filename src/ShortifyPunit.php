@@ -54,17 +54,13 @@ class ShortifyPunit
 
         $backTrace = debug_backtrace();
 
-        if ( ! isset($backTrace[2]['class'])) {
-            throw self::generateException("Error while backtracking calling class");
-        }
-
         $basename = self::$classBasePrefix;
         $namespace = self::$namespace;
 
         $reflection = new \ReflectionClass($backTrace[2]['class']);
 
         if ( ! $reflection->implementsInterface("{$namespace}\\{$basename}MockInterface") &&
-             ! in_array($backTrace[2]['class'], self::$friendClasses))
+            isset($backTrace[2]['class']) && ! in_array($backTrace[2]['class'], self::$friendClasses))
         {
             throw self::generateException("{$class} is not a friend class!");
         }
@@ -214,7 +210,7 @@ EOT;
     public static function when_chain_methods($class, array $methods, $returnType, $returnValue)
     {
         if (count($methods) < 2) {
-            self::throwException('When using concatenation must use at least 2 methods!');
+            throw self::generateException('When using concatenation must use at least 2 methods!');
         }
 
         $reversedMethods = array_reverse($methods);
@@ -232,7 +228,7 @@ EOT;
         foreach ($reversedMethods as $method => $args)
         {
             if ( ! is_string($method)) {
-                self::throwException('Invalid method name!');
+                throw self::generateException('Invalid method name!');
             }
 
             $fakeClass = new ShortifyPunitMockClassOnTheFly();
@@ -309,14 +305,12 @@ EOT;
 
         $return = self::$returnValues[$className][$methodName][$instanceId][$args];
 
-        if ($return['action'] == 'returns') {
-            return $return['value'];
-        }
-
         if ($return['action'] == 'throws') {
             throw is_object($return['value']) ? $return['value'] : new $return['value'];
         }
 
-        return NULL;
+        //if ($return['action'] == 'returns') {
+        return $return['value'];
+        //}
     }
 }

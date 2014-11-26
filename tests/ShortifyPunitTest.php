@@ -20,6 +20,14 @@ class SimpleClassForMocking
     }
 }
 
+/**
+ * Class FinalClassForMocking
+ */
+final class FinalClassForMocking
+{
+
+}
+
 class ShortifyPunitTest extends \PHPUnit_Framework_TestCase
 {
     /**
@@ -58,9 +66,18 @@ class ShortifyPunitTest extends \PHPUnit_Framework_TestCase
      * @checks Friend classes
      * @expectedException \PHPUnit_Framework_AssertionFailedError
      */
-    public function testDebugBacktrace()
+    public function testFriendClasses()
     {
         ShortifyPunit::generateInstanceId();
+    }
+
+    /**
+     * @checks Private method exist
+     * @expectedException \PHPUnit_Framework_AssertionFailedError
+     */
+    public function testMethodExist()
+    {
+        ShortifyPunit::some_fake_method();
     }
 
     /**
@@ -119,14 +136,22 @@ class ShortifyPunitTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * Fail on final class for mocking
+     * @expectedException \PHPUnit_Framework_AssertionFailedError
+     */
+    public function testFinalClassForMock()
+    {
+        $mock = ShortifyPunit::mock('FinalClassForMocking');
+    }
+
+    /**
      * Testing fake stubbing action
      * @expectedException \PHPUnit_Framework_AssertionFailedError
      */
-    public function testNoSuchAction()
+    public function testFakeStubbingAction()
     {
         $mock = ShortifyPunit::mock('SimpleClassForMocking');
 
-        // no such action test
         ShortifyPunit::when($mock)->second_method()->no_such_action('string');
     }
 
@@ -188,6 +213,13 @@ class ShortifyPunitTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('three parameters', $mock->first_method(1,2)->second_method(3,4, 5));
         $this->assertEquals('empty', $mock->first_method()->second_method()); // still keeping the last value
 
+        // three chaining
+        ShortifyPunit::when_chain_methods($mock, array('first_method' => array(1,2,5,6),
+                'second_method' => array(3,4,5),
+                'params' => array(array(), 1, new SimpleClassForMocking())),
+            'returns', 'three methods');
+
+        $this->assertEquals('three methods', $mock->first_method(1,2,5,6)->second_method(3,4,5)->params(array(), 1, new SimpleClassForMocking()));
     }
 
     /**
