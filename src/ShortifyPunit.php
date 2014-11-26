@@ -217,7 +217,7 @@ EOT;
      * @param $returnValue
      * @internal param $value
      */
-    public static function when_concat($class, array $methods, $returnType, $returnValue)
+    public static function when_chain_methods($class, array $methods, $returnType, $returnValue)
     {
         if (count($methods) < 2) {
             self::throwException('When using concatenation must use at least 2 methods!');

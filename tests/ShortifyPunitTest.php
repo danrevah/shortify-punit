@@ -99,7 +99,7 @@ class ShortifyPunitTest extends \PHPUnit_Framework_TestCase
         ShortifyPunit::when($mock)->second_method()->returns('second');
         $this->assertEquals('second', $mock->second_method());
 
-        ShortifyPunit::when_concat($mock, array('first_method' => array(),
+        ShortifyPunit::when_chain_methods($mock, array('first_method' => array(),
                                                 'second_method' => array()),
                                    'returns',
                                    'empty');
@@ -114,11 +114,11 @@ class ShortifyPunitTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('second', $mock->second_method());
 
         // testing with parameters
-        ShortifyPunit::when_concat($mock, array('first_method' => array(1,2),
+        ShortifyPunit::when_chain_methods($mock, array('first_method' => array(1,2),
                 'second_method' => array(3,4)),
             'returns', 'two parameters');
 
-        ShortifyPunit::when_concat($mock, array('first_method' => array(1,2),
+        ShortifyPunit::when_chain_methods($mock, array('first_method' => array(1,2),
                 'second_method' => array(3,4,5)),
             'returns', 'three parameters');
 
@@ -135,7 +135,7 @@ class ShortifyPunitTest extends \PHPUnit_Framework_TestCase
     {
         $mock = ShortifyPunit::mock('SimpleClassForMocking');
 
-        ShortifyPunit::when_concat($mock, array('first_method' => array()), 'returns', 'abc');
+        ShortifyPunit::when_chain_methods($mock, array('first_method' => array()), 'returns', 'abc');
     }
 
     /**
@@ -145,7 +145,7 @@ class ShortifyPunitTest extends \PHPUnit_Framework_TestCase
     {
         $mock = ShortifyPunit::mock('SimpleClassForMocking');
 
-        ShortifyPunit::when_concat($mock, array('fake method name' => array()), 'returns', 'abc');
+        ShortifyPunit::when_chain_methods($mock, array('fake method name' => array()), 'returns', 'abc');
     }
 
     /**
@@ -155,6 +155,6 @@ class ShortifyPunitTest extends \PHPUnit_Framework_TestCase
     {
         $mock = ShortifyPunit::mock('SimpleClassForMocking');
 
-        ShortifyPunit::when_concat($mock, array(1, 2), 'returns', 'abc');
+        ShortifyPunit::when_chain_methods($mock, array(1, 2), 'returns', 'abc');
     }
 }
