@@ -196,63 +196,6 @@ EOT;
     }
 
     /**
-     * Setting up a mock response, function is called from mocked classes using `friend classes` style
-     *
-     * @param $className
-     * @param $instanceId
-     * @param $methodName
-     * @param $args
-     * @param $action
-     * @param $returns
-     */
-    private static function setWhenMockResponse($className, $instanceId, $methodName, $args, $action, $returns)
-    {
-        $args = serialize($args);
-
-        self::$returnValues[$className][$instanceId][$methodName][$args] = ['action' => $action, 'value' => $returns];
-    }
-
-    /**
-     * Generating instance id, function is called from mocked classes using `friend classes` style
-     * @return int
-     */
-    private static function generateInstanceId()
-    {
-        return ++self::$instanceId;
-    }
-
-    /**
-     * Create response is a private method which is called from the Mocked classes using `friend classes` style
-     * returns a value which was set before in the When() function otherwise returning NULL
-     *
-     * @param $className
-     * @param $instanceId
-     * @param $methodName
-     * @param $args
-     * @return Mixed | null
-     */
-    private static function __create_response($className, $instanceId, $methodName, $args)
-    {
-        $args = serialize($args);
-
-
-        if (isset(self::$returnValues[$className][$instanceId][$methodName][$args]))
-        {
-            $return = self::$returnValues[$className][$instanceId][$methodName][$args];
-
-            if ($return['action'] == 'returns') {
-                return $return['value'];
-            }
-
-            if ($return['action'] == 'throws') {
-                throw is_object($return['value']) ? $return['value'] : new $return['value'];
-            }
-        }
-
-        return NULL;
-    }
-
-    /**
      * Setting up a when case
      *
      * @param $class
@@ -313,6 +256,62 @@ EOT;
             $whenCase = new ShortifyPunitWhenCase(get_class($class), $class->mockInstanceId, $lastElement);
             $whenCase->setMethod([], 'returns', $lastClass);
         }
+    }
 
+    /**
+     * Setting up a mock response, function is called from mocked classes using `friend classes` style
+     *
+     * @param $className
+     * @param $instanceId
+     * @param $methodName
+     * @param $args
+     * @param $action
+     * @param $returns
+     */
+    private static function setWhenMockResponse($className, $instanceId, $methodName, $args, $action, $returns)
+    {
+        $args = serialize($args);
+
+        self::$returnValues[$className][$instanceId][$methodName][$args] = ['action' => $action, 'value' => $returns];
+    }
+
+    /**
+     * Generating instance id, function is called from mocked classes using `friend classes` style
+     * @return int
+     */
+    private static function generateInstanceId()
+    {
+        return ++self::$instanceId;
+    }
+
+    /**
+     * Create response is a private method which is called from the Mocked classes using `friend classes` style
+     * returns a value which was set before in the When() function otherwise returning NULL
+     *
+     * @param $className
+     * @param $instanceId
+     * @param $methodName
+     * @param $args
+     * @return Mixed | null
+     */
+    private static function __create_response($className, $instanceId, $methodName, $args)
+    {
+        $args = serialize($args);
+
+
+        if (isset(self::$returnValues[$className][$instanceId][$methodName][$args]))
+        {
+            $return = self::$returnValues[$className][$instanceId][$methodName][$args];
+
+            if ($return['action'] == 'returns') {
+                return $return['value'];
+            }
+
+            if ($return['action'] == 'throws') {
+                throw is_object($return['value']) ? $return['value'] : new $return['value'];
+            }
+        }
+
+        return NULL;
     }
 }
