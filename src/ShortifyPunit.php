@@ -27,10 +27,11 @@ class ShortifyPunit
      */
     private static $returnValues = [];
 
+
     /**
      * @var array of allowed friend classes, that could access private methods of this class
      */
-    private static $friendClasses = ['ShortifyPunit\ShortifyPunitWhenCase'];
+    private static $friendClasses = ['ShortifyPunit\ShortifyPunitWhenCase', 'ShortifyPunit\ShortifyPunitMockClassOnTheFly'];
 
     /**
      * Call static function is used to detect calls to protected & private methods
@@ -212,22 +213,27 @@ EOT;
      * Setting up a when concatenation case
      * @param $class
      * @param array $methods
-     * @param $value
+     * @param $returnType
+     * @param $returnValue
+     * @internal param $value
      */
-    public static function when_concat($class, array $methods, $value)
+    public static function when_concat($class, array $methods, $returnType, $returnValue)
     {
         if (count($methods) < 2) {
-            self::throwException('When concat must get at least methods!');
+            self::throwException('When using concatenation must get at least 2 methods!');
         }
 
         $reversedMethods = array_reverse($methods);
 
         // pop out the last element (=first before using array_reverse)
-        $lastElement = array_pop($reversedMethods);
+        list($value, $key) = array(end($reversedMethods), key($reversedMethods));
+        $lastElement[$key] = $value;
+        array_pop($reversedMethods);
+
         $lastClass = false;
 
         // now after the array_pop this will loop only the functions without the first method
-        foreach ($reversedMethods as $method)
+        foreach ($reversedMethods as $method => $args)
         {
             if ( ! is_string($method)) {
                 self::throwException('Invalid method name!');
@@ -235,26 +241,26 @@ EOT;
 
             $fakeClass = new ShortifyPunitMockClassOnTheFly();
 
-            if ($lastClass === false)
-            {
-                // @todo Don't forget to handle arguments with func get args
-                $fakeClass->$method = function() use ($value) {
-                    return $value;
-                };
+            // if this concatenated object method doesn't have already has an instance id, use it instead of re-creating
+            $instanceId = ( ! isset(self::$returnValues['Concatobject'][$method])) ? ++self::$instanceId : key(self::$returnValues['Concatobject'][$method]);
+
+            if ($lastClass === false) {
+                self::setWhenMockResponse('Concatobject', $instanceId, $method, $args, $returnType, $returnValue);
             }
-            else
-            {
-                $fakeClass->$method = function() use ($lastClass) {
-                  return $lastClass;
-                };
+            else {
+                self::setWhenMockResponse('Concatobject', $instanceId, $method, $args, $returnType, $lastClass);
             }
+
+            $fakeClass->$method = function() use ($returnValue, $args, $instanceId, $method) {
+                return ShortifyPunit::__create_response('Concatobject', $instanceId, $method, func_get_args());
+            };
 
             $lastClass = $fakeClass;
         }
 
         if ($class instanceof ShortifyPunitMockInterface) {
-            $whenCase = new ShortifyPunitWhenCase(get_class($class), $class->mockInstanceId, $lastElement);
-            $whenCase->setMethod([], 'returns', $lastClass);
+            $whenCase = new ShortifyPunitWhenCase(get_class($class), $class->mockInstanceId, key($lastElement));
+            $whenCase->setMethod(current($lastElement), 'returns', $lastClass);
         }
     }
 
@@ -272,7 +278,7 @@ EOT;
     {
         $args = serialize($args);
 
-        self::$returnValues[$className][$instanceId][$methodName][$args] = ['action' => $action, 'value' => $returns];
+        self::$returnValues[$className][$methodName][$instanceId][$args] = ['action' => $action, 'value' => $returns];
     }
 
     /**
@@ -298,10 +304,9 @@ EOT;
     {
         $args = serialize($args);
 
-
-        if (isset(self::$returnValues[$className][$instanceId][$methodName][$args]))
+        if (isset(self::$returnValues[$className][$methodName][$instanceId][$args]))
         {
-            $return = self::$returnValues[$className][$instanceId][$methodName][$args];
+            $return = self::$returnValues[$className][$methodName][$instanceId][$args];
 
             if ($return['action'] == 'returns') {
                 return $return['value'];

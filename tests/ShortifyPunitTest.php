@@ -99,18 +99,33 @@ class ShortifyPunitTest extends \PHPUnit_Framework_TestCase
         ShortifyPunit::when($mock)->second_method()->returns('second');
         $this->assertEquals('second', $mock->second_method());
 
-        ShortifyPunit::when_concat($mock, array('first_method',
-                                                'second_method'),
-                                   'abc');
+        ShortifyPunit::when_concat($mock, array('first_method' => array(),
+                                                'second_method' => array()),
+                                   'returns',
+                                   'empty');
 
         // asserting that first method returns `MockClassOnTheFly` object
         $this->assertInstanceOf('ShortifyPunit\ShortifyPunitMockClassOnTheFly', $mock->first_method());
 
         // asserting concatenation
-        $this->assertEquals('abc', $mock->first_method()->second_method());
+        $this->assertEquals('empty', $mock->first_method()->second_method());
 
         // checking that second_method wasn't changed due to concatenation
         $this->assertEquals('second', $mock->second_method());
+
+        // testing with parameters
+        ShortifyPunit::when_concat($mock, array('first_method' => array(1,2),
+                'second_method' => array(3,4)),
+            'returns', 'two parameters');
+
+        ShortifyPunit::when_concat($mock, array('first_method' => array(1,2),
+                'second_method' => array(3,4,5)),
+            'returns', 'three parameters');
+
+        $this->assertEquals('two parameters', $mock->first_method(1,2)->second_method(3,4));
+        $this->assertEquals('three parameters', $mock->first_method(1,2)->second_method(3,4, 5));
+        $this->assertEquals('empty', $mock->first_method()->second_method()); // still keeping the last value
+
     }
 
     /**
@@ -120,7 +135,7 @@ class ShortifyPunitTest extends \PHPUnit_Framework_TestCase
     {
         $mock = ShortifyPunit::mock('SimpleClassForMocking');
 
-        ShortifyPunit::when_concat($mock, array('first_method'), 'abc');
+        ShortifyPunit::when_concat($mock, array('first_method' => array()), 'returns', 'abc');
     }
 
     /**
@@ -130,7 +145,7 @@ class ShortifyPunitTest extends \PHPUnit_Framework_TestCase
     {
         $mock = ShortifyPunit::mock('SimpleClassForMocking');
 
-        ShortifyPunit::when_concat($mock, array('fake method name'), 'abc');
+        ShortifyPunit::when_concat($mock, array('fake method name' => array()), 'returns', 'abc');
     }
 
     /**
@@ -140,6 +155,6 @@ class ShortifyPunitTest extends \PHPUnit_Framework_TestCase
     {
         $mock = ShortifyPunit::mock('SimpleClassForMocking');
 
-        ShortifyPunit::when_concat($mock, array(1, 2), 'abc');
+        ShortifyPunit::when_concat($mock, array(1, 2), 'returns', 'abc');
     }
 }
