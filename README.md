@@ -59,14 +59,14 @@ try {
 ## Stubbing Method Chanining
 ```php
  // Mocking method chaining
- ShortifyPunit::when_concat($mock, array('first_method' => array(1),
+ ShortifyPunit::when_chain_methods($mock, array('first_method' => array(1),
                                           'second_method' => array()),
                             'returns', 'some string');
  
  // returns "some string"
  $mock->first_method(1)->second_method();
  
- ShortifyPunit::when_concat($mock, array('first_method' => array(),
+ ShortifyPunit::when_chain_methods($mock, array('first_method' => array(),
                                           'second_method' => array()),
                             'throws', new \Exception);
   
