@@ -220,7 +220,7 @@ EOT;
     public static function when_concat($class, array $methods, $returnType, $returnValue)
     {
         if (count($methods) < 2) {
-            self::throwException('When using concatenation must get at least 2 methods!');
+            self::throwException('When using concatenation must use at least 2 methods!');
         }
 
         $reversedMethods = array_reverse($methods);
@@ -255,7 +255,7 @@ EOT;
                 self::setWhenMockResponse($returnValuesKey, $instanceId, $method, $args, $returnType, $lastClass);
             }
 
-            // Create fake method 
+            // Create fake method
             $fakeClass->$method = function() use ($returnValue, $args, $instanceId, $method, $returnValuesKey) {
                 return ShortifyPunit::__create_response($returnValuesKey, $instanceId, $method, func_get_args());
             };
