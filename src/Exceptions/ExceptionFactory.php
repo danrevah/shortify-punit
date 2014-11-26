@@ -1,5 +1,5 @@
 <?php
-namespace spu\Exceptions;
+namespace ShortifyPunit\Exceptions;
 
 trait ExceptionFactory
 {

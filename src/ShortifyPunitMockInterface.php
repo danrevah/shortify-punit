@@ -1,5 +1,5 @@
 <?php
-namespace spu;
+namespace ShortifyPunit;
 
 /**
  * Interface ShortifyPunitMockInterface

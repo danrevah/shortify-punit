@@ -1,10 +1,7 @@
 <?php
 namespace ShortifyPunit;
 
-use spu\Exceptions\ExceptionFactory;
-use spu\ShortifyPunitMockInterface;
-use spu\ShortifyPunitWhenCase;
-use spu\ShortifyPunitMockClassOnTheFly;
+use ShortifyPunit\Exceptions\ExceptionFactory;
 
 class ShortifyPunit
 {

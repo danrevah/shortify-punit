@@ -1,6 +1,20 @@
 <?php
 use ShortifyPunit\ShortifyPunit;
 
+/**
+ * Class SimpleClassForMocking
+ */
+class SimpleClassForMocking
+{
+    public function first_method() {
+        return 1;
+    }
+
+    public function second_method() {
+        return 2;
+    }
+}
+
 class ShortifyPunitTest extends \PHPUnit_Framework_TestCase
 {
     /**
@@ -90,7 +104,7 @@ class ShortifyPunitTest extends \PHPUnit_Framework_TestCase
                                    'abc');
 
         // asserting that first method returns `MockClassOnTheFly` object
-        $this->assertInstanceOf('ShortifyPunit\MockClassOnTheFly', $mock->first_method());
+        $this->assertInstanceOf('ShortifyPunit\ShortifyPunitMockClassOnTheFly', $mock->first_method());
 
         // asserting concatenation
         $this->assertEquals('abc', $mock->first_method()->second_method());
