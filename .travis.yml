@@ -11,6 +11,17 @@ matrix:
     - php: hhvm
   fast_finish: true
 
-before_script:
+install:
   - composer self-update
   - composer install
+  - composer require satooshi/php-coveralls:~0.6@stable
+
+before_script:
+  - mkdir -p build/logs
+
+script:
+  - phpunit --coverage-clover build/logs/clover.xml
+
+after_success:
+  - sh -c 'if [ "$TRAVIS_PHP_VERSION" != "hhvm" ]; then php vendor/bin/coveralls -v; fi;'
+
