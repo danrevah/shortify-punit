@@ -75,9 +75,6 @@ try {
   
  // throws Exception
  $mock->first_method()->second_method();
- 
- // still returns "some string"
- $mock->first_method(1)->second_method();
 ```
   
   
