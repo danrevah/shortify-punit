@@ -5,6 +5,7 @@
  * [Mocking](#mocking-examples)
  * [Stubbing](#stubbing)
  * [Stubbing Method Chaning](#stubbing-method-chaining)
+ * [TODO](#todo)
 
 ## Installation
 
@@ -59,6 +60,7 @@ try {
   echo 'Exception Was Caught!';
 }
 ```
+The `when` function is used to stubbing methods with specific parameters, using throw or return action.
 
 ## Stubbing Method Chanining
 ```php
@@ -80,5 +82,8 @@ try {
  // throws Exception
  $mock->first_method()->second_method();
 ```
+The `when_chain_methods` function is used chain methods for stubbing, using the same actions as the single function stubbing, return or throw.
   
-  
+## TODO
+ * improve syntax of `when chain methods` if possible to make it more similar to `when` function syntax
+ * function to verify calls amount to stubbed function & chained stubbed function 
