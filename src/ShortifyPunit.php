@@ -49,13 +49,13 @@ class ShortifyPunit
         $class = get_called_class();
 
         if ( ! method_exists($class, $name)) {
-            self::throwException("{$class} has no such method!");
+            throw self::generateException("{$class} has no such method!");
         }
 
         $backTrace = debug_backtrace();
 
         if ( ! isset($backTrace[2]['class'])) {
-            self::throwException("Error while backtracking calling class");
+            throw self::generateException("Error while backtracking calling class");
         }
 
         $basename = self::$classBasePrefix;
@@ -66,7 +66,7 @@ class ShortifyPunit
         if ( ! $reflection->implementsInterface("{$namespace}\\{$basename}MockInterface") &&
              ! in_array($backTrace[2]['class'], self::$friendClasses))
         {
-            self::throwException("{$class} is not a friend class!");
+            throw self::generateException("{$class} is not a friend class!");
         }
 
         return forward_static_call_array('static::'.$name, $arguments);
@@ -83,13 +83,13 @@ class ShortifyPunit
     {
 
         if ( ! class_exists($mockedClass) and ! interface_exists($mockedClass)) {
-            self::throwException("Mocking failed `{$mockedClass}` No such class or interface");
+            throw self::generateException("Mocking failed `{$mockedClass}` No such class or interface");
         }
 
         $reflection = new \ReflectionClass($mockedClass);
 
         if ($reflection->isFinal()) {
-            self::throwException("Unable to mock class {$mockedClass} declared as final");
+            throw self::generateException("Unable to mock class {$mockedClass} declared as final");
         }
 
         $basename = self::$classBasePrefix;
@@ -126,10 +126,6 @@ EOT;
         /* Mocking methods */
         foreach ($methods as $method)
         {
-            if ( ! $method instanceof \ReflectionMethod) {
-                continue;
-            }
-
             // Ignoring final & private methods
             if ($method->isFinal() || $method->isPrivate()) {
                 continue;
@@ -150,10 +146,6 @@ EOT;
             // Get method parameters
             foreach ($method->getParameters() as $param)
             {
-                if ( ! $param instanceof \ReflectionParameter) {
-                    continue;
-                }
-
                 // Get type hinting
                 if ($param->isArray()) {
                     $type = 'array ';
@@ -207,6 +199,8 @@ EOT;
         if ($class instanceof ShortifyPunitMockInterface) {
             return new ShortifyPunitWhenCase(get_class($class), $class->mockInstanceId);
         }
+
+        return NULL;
     }
 
     /**
@@ -309,17 +303,18 @@ EOT;
     {
         $args = serialize($args);
 
-        if (isset(self::$returnValues[$className][$methodName][$instanceId][$args]))
-        {
-            $return = self::$returnValues[$className][$methodName][$instanceId][$args];
+        if ( ! isset(self::$returnValues[$className][$methodName][$instanceId][$args])) {
+            return NULL;
+        }
 
-            if ($return['action'] == 'returns') {
-                return $return['value'];
-            }
+        $return = self::$returnValues[$className][$methodName][$instanceId][$args];
 
-            if ($return['action'] == 'throws') {
-                throw is_object($return['value']) ? $return['value'] : new $return['value'];
-            }
+        if ($return['action'] == 'returns') {
+            return $return['value'];
+        }
+
+        if ($return['action'] == 'throws') {
+            throw is_object($return['value']) ? $return['value'] : new $return['value'];
         }
 
         return NULL;

@@ -13,6 +13,11 @@ class SimpleClassForMocking
     public function second_method() {
         return 2;
     }
+
+    public function params(array $arr, SimpleClassForMocking $instance, $code = 1)
+    {
+
+    }
 }
 
 class ShortifyPunitTest extends \PHPUnit_Framework_TestCase
@@ -50,11 +55,20 @@ class ShortifyPunitTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @checks Friend classes
+     * @expectedException \PHPUnit_Framework_AssertionFailedError
+     */
+    public function testDebugBacktrace()
+    {
+        ShortifyPunit::generateInstanceId();
+    }
+
+    /**
      * Mock return values test
      * @checks return values of several mocks
      * @expects correct return value in correct format (int|string)
      */
-    public function testMockReturnValues()
+    public function testStubbingReturnValues()
     {
         $mock = ShortifyPunit::mock('SimpleClassForMocking');
 
@@ -66,6 +80,54 @@ class ShortifyPunitTest extends \PHPUnit_Framework_TestCase
 
         ShortifyPunit::when($mock)->second_method()->returns('string');
         $this->assertEquals('string', $mock->second_method());
+
+        ShortifyPunit::when($mock)->params(array(), $mock, 'abc')->returns(1);
+        $this->assertEquals(1, $mock->params(array(), $mock, 'abc'));
+    }
+
+    /**
+     * @checks when which is not instance of Mock
+     */
+    public function testWhenNotInstanceOf()
+    {
+        $someClass = new SimpleClassForMocking();
+        $when = ShortifyPunit::when($someClass);
+        $this->assertNull($when);
+    }
+
+    /**
+     * Stubbing throw exceptions test
+     * @checks throw exception stubbing
+     * @expectedException \Exception
+     */
+    public function testStubbingThrowException()
+    {
+        $mock = ShortifyPunit::mock('SimpleClassForMocking');
+
+        ShortifyPunit::when($mock)->first_method()->throws(new \Exception());
+
+        $mock->first_method();
+    }
+
+    /**
+     * Testing fake class mock
+     * @expectedException \PHPUnit_Framework_AssertionFailedError
+     */
+    public function testFakeClassMock()
+    {
+        $mock = ShortifyPunit::mock('some_fake_class_name_to_mock');
+    }
+
+    /**
+     * Testing fake stubbing action
+     * @expectedException \PHPUnit_Framework_AssertionFailedError
+     */
+    public function testNoSuchAction()
+    {
+        $mock = ShortifyPunit::mock('SimpleClassForMocking');
+
+        // no such action test
+        ShortifyPunit::when($mock)->second_method()->no_such_action('string');
     }
 
     /**

@@ -26,4 +26,15 @@ class ShortifyPunitMockClassOnTheFlyTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($fakeClass->$some_method_1(), 1);
         $this->assertEquals($fakeClass->$some_method_2(), 2);
     }
+
+    /**
+     * @expectedException \PHPUnit_Framework_AssertionFailedError
+     */
+    public function testMethodWhenCallsAllowedActions()
+    {
+        $fakeClass = new ShortifyPunitMockClassOnTheFly();
+
+        $missing_method_test = 'missing_method_test';
+        $fakeClass->$missing_method_test();
+    }
 }

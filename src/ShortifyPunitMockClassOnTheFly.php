@@ -13,10 +13,16 @@ class ShortifyPunitMockClassOnTheFly
 
     private $methods = [];
 
+    /**
+     * @param $key
+     * @param $args
+     * @throws static
+     * @return mixed
+     */
     public function __call($key, $args)
     {
         if ( ! isset($this->methods[$key])) {
-            static::throwException("`{$key}` no such method!");
+            throw static::generateException("`{$key}` no such method!");
         }
 
         return call_user_func_array($this->methods[$key], $args);

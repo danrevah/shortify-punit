@@ -37,13 +37,13 @@ class ShortifyPunitWhenCase
                 $this->args = $args;
             }
             else {
-                static::throwException("`{$method}` method doesn't exist in {$this->className} !");
+                throw static::generateException("`{$method}` method doesn't exist in {$this->className} !");
             }
         }
         else
         {
             if ( ! isset($args[0])) {
-                static::throwException("Invalid call to ShortifyPunitWhenCase!");
+                throw static::generateException("Invalid call to ShortifyPunitWhenCase!");
             }
 
             $value = $args[0];
@@ -56,7 +56,7 @@ class ShortifyPunitWhenCase
                     break;
 
                 default:
-                    static::throwException("`{$method}` no such action!");
+                    throw static::generateException("`{$method}` no such action!");
                     break;
             }
         }
