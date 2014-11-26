@@ -58,6 +58,9 @@ try {
 
 ## Stubbing Method Chanining
 ```php
+ // Creating a new mock for SimpleClassForMocking
+ $mock = ShortifyPunit::mock('SimpleClassForMocking');
+
  // Mocking method chaining
  ShortifyPunit::when_chain_methods($mock, array('first_method' => array(1),
                                           'second_method' => array()),
