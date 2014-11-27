@@ -57,7 +57,6 @@ class ShortifyPunitWhenCase
 
                 default:
                     throw static::generateException("`{$method}` no such action!");
-                    break;
             }
         }
 
