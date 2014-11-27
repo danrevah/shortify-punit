@@ -5,7 +5,6 @@
  * [Mocking](#mocking-examples)
  * [Stubbing](#stubbing)
  * [Stubbing Method Chaning](#stubbing-method-chaining)
- * [TODO](#todo)
 
 ## Installation
 
@@ -88,6 +87,4 @@ The `when` function is used to stubbing methods with specific parameters, using 
  $mock->first_method()->second_method();
 ```
 The `when_chain_methods` function is used chain methods for stubbing, using the same actions as the single function stubbing, return or throw.
-  
-## TODO
- * function to verify calls amount to stubbed function & chained stubbed function 
+
