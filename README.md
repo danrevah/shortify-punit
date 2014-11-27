@@ -78,6 +78,11 @@ The `when` function is used to stubbing methods with specific parameters, using 
  ShortifyPunit::when_chain_methods($mock, array('first_method' => array(),
                                           'second_method' => array()),
                             'throws', new \Exception);
+                            
+ // OR
+ ShortifyPunit::when_chain_methods($mock, array('first_method' => array(),
+                                          'second_method' => array()),
+                            'throws', 'Exception');
   
  // throws Exception
  $mock->first_method()->second_method();
