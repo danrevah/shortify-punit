@@ -1,4 +1,5 @@
 <?php
+use ShortifyPunit\Enums\MockAction;
 use ShortifyPunit\ShortifyPunit;
 
 /**
@@ -188,7 +189,7 @@ class ShortifyPunitTest extends \PHPUnit_Framework_TestCase
 
         ShortifyPunit::when_chain_methods($mock, array('first_method' => array(),
                                                 'second_method' => array()),
-                                   'returns',
+                                   MockAction::RETURNS,
                                    'empty');
 
         // asserting that first method returns `MockClassOnTheFly` object
@@ -203,11 +204,11 @@ class ShortifyPunitTest extends \PHPUnit_Framework_TestCase
         // testing with parameters
         ShortifyPunit::when_chain_methods($mock, array('first_method' => array(1,2),
                 'second_method' => array(3,4)),
-            'returns', 'two parameters');
+            MockAction::RETURNS, 'two parameters');
 
         ShortifyPunit::when_chain_methods($mock, array('first_method' => array(1,2),
                 'second_method' => array(3,4,5)),
-            'returns', 'three parameters');
+            MockAction::RETURNS, 'three parameters');
 
         $this->assertEquals('two parameters', $mock->first_method(1,2)->second_method(3,4));
         $this->assertEquals('three parameters', $mock->first_method(1,2)->second_method(3,4, 5));
@@ -217,7 +218,7 @@ class ShortifyPunitTest extends \PHPUnit_Framework_TestCase
         ShortifyPunit::when_chain_methods($mock, array('first_method' => array(1,2,5,6),
                 'second_method' => array(3,4,5),
                 'params' => array(array(), 1, new SimpleClassForMocking())),
-            'returns', 'three methods');
+            MockAction::RETURNS, 'three methods');
 
         $this->assertEquals('three methods', $mock->first_method(1,2,5,6)->second_method(3,4,5)->params(array(), 1, new SimpleClassForMocking()));
     }
@@ -229,7 +230,7 @@ class ShortifyPunitTest extends \PHPUnit_Framework_TestCase
     {
         $mock = ShortifyPunit::mock('SimpleClassForMocking');
 
-        ShortifyPunit::when_chain_methods($mock, array('first_method' => array()), 'returns', 'abc');
+        ShortifyPunit::when_chain_methods($mock, array('first_method' => array()), MockAction::RETURNS, 'abc');
     }
 
     /**
@@ -239,7 +240,7 @@ class ShortifyPunitTest extends \PHPUnit_Framework_TestCase
     {
         $mock = ShortifyPunit::mock('SimpleClassForMocking');
 
-        ShortifyPunit::when_chain_methods($mock, array('fake method name' => array()), 'returns', 'abc');
+        ShortifyPunit::when_chain_methods($mock, array('fake method name' => array()), MockAction::RETURNS, 'abc');
     }
 
     /**
@@ -249,6 +250,6 @@ class ShortifyPunitTest extends \PHPUnit_Framework_TestCase
     {
         $mock = ShortifyPunit::mock('SimpleClassForMocking');
 
-        ShortifyPunit::when_chain_methods($mock, array(1, 2), 'returns', 'abc');
+        ShortifyPunit::when_chain_methods($mock, array(1, 2), MockAction::RETURNS, 'abc');
     }
 }

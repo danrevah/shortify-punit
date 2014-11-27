@@ -1,6 +1,7 @@
 <?php
 namespace ShortifyPunit;
 
+use ShortifyPunit\Enums\MockAction;
 use ShortifyPunit\Exceptions\ExceptionFactory;
 
 class ShortifyPunit
@@ -255,7 +256,7 @@ EOT;
 
         if ($class instanceof ShortifyPunitMockInterface) {
             $whenCase = new ShortifyPunitWhenCase(get_class($class), $class->mockInstanceId, key($firstElement));
-            $whenCase->setMethod(current($firstElement), 'returns', $lastClass);
+            $whenCase->setMethod(current($firstElement), MockAction::RETURNS, $lastClass);
         }
     }
 
@@ -305,11 +306,11 @@ EOT;
 
         $return = self::$returnValues[$className][$methodName][$instanceId][$args];
 
-        if ($return['action'] == 'throws') {
+        if ($return['action'] == MockAction::THROWS) {
             throw is_object($return['value']) ? $return['value'] : new $return['value'];
         }
 
-        //if ($return['action'] == 'returns') {
+        //if ($return['action'] == MockAction::RETURNS) {
         return $return['value'];
         //}
     }

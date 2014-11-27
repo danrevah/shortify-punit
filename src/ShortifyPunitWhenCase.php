@@ -1,5 +1,6 @@
 <?php
 namespace ShortifyPunit;
+use ShortifyPunit\Enums\MockAction;
 use ShortifyPunit\Exceptions\ExceptionFactory;
 
 /**
@@ -50,8 +51,8 @@ class ShortifyPunitWhenCase
 
             switch($method)
             {
-                case 'throws':
-                case 'returns':
+                case MockAction::THROWS:
+                case MockAction::RETURNS:
                     $this->setMethod($this->args, $method, $value);
                     break;
 
