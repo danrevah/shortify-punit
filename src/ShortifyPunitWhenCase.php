@@ -4,7 +4,7 @@ use ShortifyPunit\Exceptions\ExceptionFactory;
 
 /**
  * Class ShortifyPunitWhenCase
- * @package Spu
+ * @package ShortifyPunit
  * @desc When Case, is used to set up mocking response using specific call arguments
  *       and return action (throw exception, return value, ..)
  */
