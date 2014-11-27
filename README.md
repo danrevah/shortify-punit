@@ -90,5 +90,4 @@ The `when` function is used to stubbing methods with specific parameters, using 
 The `when_chain_methods` function is used chain methods for stubbing, using the same actions as the single function stubbing, return or throw.
   
 ## TODO
- * improve syntax of `when chain methods` if possible to make it more similar to `when` function syntax
  * function to verify calls amount to stubbed function & chained stubbed function 
