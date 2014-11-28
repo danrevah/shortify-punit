@@ -1,8 +1,9 @@
 { 
-    "name": "danrevah/spu",
-    "description": "Simple PHP Mocking framework",
+    "name": "danrevah/shortifypunit",
+    "description": "PHP Mocking framework",
     "require": {
-        "php": ">=5.4.0"
+        "php": ">=5.4.0",
+        "hamcrest/hamcrest-php": "dev-master"
     },
     "homepage": "https://github.com/danrevah/ShortifyPunit",
     "license": "MIT",

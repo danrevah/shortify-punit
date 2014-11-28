@@ -1,6 +1,7 @@
 <?php
 namespace ShortifyPunit;
 
+use Hamcrest\AssertionError;
 use ShortifyPunit\Mock\MockInterface;
 use ShortifyPunit\Enums\MockAction;
 use ShortifyPunit\Exceptions\ExceptionFactory;
@@ -259,8 +260,56 @@ EOT;
 
         // Check current method exist in return values chain
         $serializedArgs = serialize($args);
-        if ( ! isset($rReturnValues[$currentMethodName][$serializedArgs])) {
-            return NULL;
+
+        if ( ! isset($rReturnValues[$currentMethodName][$serializedArgs]))
+        {
+            $foundMatchingHamcrest = false;
+
+            // if doesn't have exactly the arguments check for Hamcrest-PHP functions to validate
+            foreach ($rReturnValues[$currentMethodName] as $currentMethodArguments => $currentMethod)
+            {
+                if ($foundMatchingHamcrest) {
+                    continue;
+                }
+
+                // if not Hamcrest Function
+                if (strpos($currentMethodArguments, 'Hamcrest\\') === false) {
+                    continue;
+                }
+
+                $hamcrest = unserialize($currentMethodArguments);
+
+                try
+                {
+                    // Loop both hamcrest and arguments
+                    foreach ($args as $index => $arg)
+                    {
+                        try
+                        {
+                            if ( ! array_key_exists($index, $hamcrest)) {
+                                throw new AssertionError('not enought hamcrest indexes');
+                            }
+
+                            // @throws Assertion error on failure
+                            assertThat($arg, $hamcrest[$index]);
+                        } catch (AssertionError $e) {
+                            throw $e;
+                        }
+                    }
+                }
+                catch(AssertionError $e) {
+                    continue;
+                }
+
+
+                // if didn't catched assert error then its matching an hamcrest
+                $foundMatchingHamcrest = true;
+                $serializedArgs = $currentMethodArguments;
+            }
+
+            if ( ! $foundMatchingHamcrest) {
+                return NULL;
+            }
         }
 
         $response = $rReturnValues[$currentMethodName][$serializedArgs];
@@ -326,8 +375,60 @@ EOT;
     {
         $args = serialize($args);
 
-        if ( ! isset(self::$returnValues[$className][$methodName][$instanceId][$args])) {
-            return NULL;
+        if ( ! isset(self::$returnValues[$className][$methodName][$instanceId][$args]))
+        {
+            $foundMatchingHamcrest = false;
+
+            if (isset(self::$returnValues[$className][$methodName][$instanceId]))
+            {
+                $argsArray = unserialize($args);
+
+                // if doesn't have exactly the arguments check for Hamcrest-PHP functions to validate
+                foreach (self::$returnValues[$className][$methodName][$instanceId] as $currentMethodArguments => $currentMethod)
+                {
+                    if ($foundMatchingHamcrest) {
+                        continue;
+                    }
+
+                    // if not Hamcrest Function
+                    if (strpos($currentMethodArguments, 'Hamcrest\\') === false) {
+                        continue;
+                    }
+
+                    $hamcrest = unserialize($currentMethodArguments);
+
+                    try
+                    {
+                        // Loop both hamcrest and arguments
+                        foreach ($argsArray as $index => $arg)
+                        {
+                            try
+                            {
+                                if ( ! array_key_exists($index, $hamcrest)) {
+                                    throw new AssertionError('not enought hamcrest indexes');
+                                }
+
+                                // @throws Assertion error on failure
+                                assertThat($arg, $hamcrest[$index]);
+                            } catch (AssertionError $e) {
+                                throw $e;
+                            }
+                        }
+                    }
+                    catch(AssertionError $e) {
+                        continue;
+                    }
+
+
+                    // if didn't catched assert error then its matching an hamcrest
+                    $foundMatchingHamcrest = true;
+                    $args = $currentMethodArguments;
+                }
+            }
+
+            if ( ! $foundMatchingHamcrest) {
+                return NULL;
+            }
         }
 
         $return = self::$returnValues[$className][$methodName][$instanceId][$args];

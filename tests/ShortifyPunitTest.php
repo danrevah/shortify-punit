@@ -201,6 +201,8 @@ class ShortifyPunitTest extends \PHPUnit_Framework_TestCase
         ShortifyPunit::when_chain($mock)->first_method(1,2)->second_method(1,3)->third_method()->returns(7);
         ShortifyPunit::when_chain($mock)->first_method(1,2)->second_method(1,8)->third_method()->fourth_method(2)->returns(8);
 
+        ShortifyPunit::when_chain($mock)->first_method(equalTo(5))->second_method(1,8)->third_method(anything())->fourth_method(startsWith('foo'))->returns(9);
+
         $this->assertEquals($mock->first_method()->second_method(2,3), 1);
         $this->assertEquals($mock->first_method()->second_method(2,3,4), 2);
         $this->assertEquals($mock->first_method(1)->second_method(2,3,4), 3);
@@ -209,6 +211,8 @@ class ShortifyPunitTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($mock->first_method(1,2,3)->second_method(1,2)->third_method(), 6);
         $this->assertEquals($mock->first_method(1,2)->second_method(1,3)->third_method(), 7);
         $this->assertEquals($mock->first_method(1,2)->second_method(1,8)->third_method()->fourth_method(2), 8);
+
+        $this->assertEquals($mock->first_method(5)->second_method(1,8)->third_method('foo')->fourth_method('foo bar'), 9);
 
         $this->assertNull($mock->first_method(1,2)->second_method());
         $this->assertNull($mock->first_method(1,2)->second_method(1,8)->third_method(312321231));
@@ -275,5 +279,35 @@ class ShortifyPunitTest extends \PHPUnit_Framework_TestCase
         $response['first_method']['a:0:{}']['second_method'] = ['a:2:{i:0;i:2;i:1;i:3;}' => []];
         ShortifyPunit::setReturnValues($response);
         $mock->first_method()->second_method(2,3);
+    }
+
+    /**
+     * Testing the hamcrest functions
+     */
+    public function testHamcrestTest()
+    {
+        $mock = ShortifyPunit::mock('SimpleClassForMocking');
+
+        ShortifyPunit::when_chain($mock)->first_method()->second_method(anything())->returns(1);
+        ShortifyPunit::when_chain($mock)->first_method(1)->second_method(equalTo(1))->returns(2);
+        ShortifyPunit::when_chain($mock)->first_method(2)->second_method(anything(), equalTo(1))->returns(3);
+        ShortifyPunit::when_chain($mock)->first_method(3)->second_method(containsString('foo bar'), anInstanceOf('SimpleClassForMocking'))->returns(4);
+        ShortifyPunit::when_chain($mock)->first_method(equalTo(4))->second_method(1)->returns(5);
+
+        $this->assertEquals($mock->first_method()->second_method(1), 1);
+        $this->assertEquals($mock->first_method()->second_method(array()), 1);
+        $this->assertNull($mock->first_method('foo'));
+
+        $this->assertEquals($mock->first_method(1)->second_method(1), 2);
+        $this->assertNull($mock->first_method(1)->second_method('bar'));
+
+        $this->assertEquals($mock->first_method(2)->second_method('anything', 1), 3);
+        $this->assertNull($mock->first_method(2)->second_method(false, 2));
+
+        $this->assertEquals($mock->first_method(3)->second_method('foo bar', $mock), 4);
+        $this->assertNull($mock->first_method(3)->second_method('foo', $mock));
+        $this->assertNull($mock->first_method(3)->second_method('foo bar', new Exception()));
+
+        $this->assertEquals($mock->first_method(4)->second_method(1), 5);
     }
 }
