@@ -17,6 +17,7 @@ class WhenCase
     private $className;
     private $method;
     private $args;
+    private $instanceId;
 
     public function __construct($className, $instanceId, $method = '')
     {

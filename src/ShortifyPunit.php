@@ -109,11 +109,18 @@ class ShortifyPunit
 
         $className = $reflection->getName();
         $methods = $reflection->getMethods();
-        $extends = $reflection->isInterface() ? 'implements' : 'extends';
-        $marker = $reflection->isInterface() ? ", {$namespace}\\Mock\\MockInterface" : "implements {$namespace}\\Mock\\MockInterface";
+
+        if ($reflection->isInterface()) {
+            $extends = 'implements';
+            $marker = ", {$namespace}\\Mock\\MockInterface" ;
+        }
+        else {
+            $extends = 'extends';
+            $marker = "implements {$namespace}\\Mock\\MockInterface";
+        }
 
         $namespaceDeclaration = $mockedNamespace ? "namespace $mockedNamespace;" : '';
-        $mockerClass = $mockedNamespace.'\\'.$mockedObjectName;
+        $mockerClass = "{$mockedNamespace}\\{$mockedObjectName}";
 
         // Prevent duplicate mocking, return new instance of the mocked class
         if (class_exists($mockerClass, FALSE)) {
@@ -121,12 +128,9 @@ class ShortifyPunit
         }
 
         $class = static::mockClass($namespaceDeclaration, $mockedObjectName, $extends, $className, $marker, $namespace, $basename, $methods);
-
         eval($class);
 
-        $mockObject = new $mockedObjectName();
-
-        return $mockObject;
+        return new $mockedObjectName();
     }
 
     /**
