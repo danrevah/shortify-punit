@@ -1,7 +1,7 @@
 <?php
 use ShortifyPunit\Mock\MockClassOnTheFly;
 
-class ShortifyPunitMockClassOnTheFlyTest extends \PHPUnit_Framework_TestCase
+class MockClassOnTheFlyTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * Testing the create functions on the fly class
