@@ -66,25 +66,15 @@ The `when` function is used to stubbing methods with specific parameters, using 
  // Creating a new mock for SimpleClassForMocking
  $mock = ShortifyPunit::mock('SimpleClassForMocking');
 
- // Mocking method chaining
- ShortifyPunit::when_chain_methods($mock, array('first_method' => array(1),
-                                          'second_method' => array()),
-                            MockAction::RETURNS, 'some string');
- 
- // returns "some string"
- $mock->first_method(1)->second_method();
- 
- ShortifyPunit::when_chain_methods($mock, array('first_method' => array(),
-                                          'second_method' => array()),
-                            MockAction::THROWS, new \Exception);
-                            
- // OR
- ShortifyPunit::when_chain_methods($mock, array('first_method' => array(),
-                                          'second_method' => array()),
-                            MockAction::THROWS, 'Exception');
+  ShortifyPunit::when_chain_methods($mock)->first_method()->second_method(2,3)->returns(1);
+  ShortifyPunit::when_chain_methods($mock)->first_method()->second_method(2,3,4)->returns(2);
+  ShortifyPunit::when_chain_methods($mock)->first_method(1)->second_method(2,3,4)->returns(3);
+  ShortifyPunit::when_chain_methods($mock)->first_method(1,2,3)->second_method(1,2)->third_method()->returns(4);
   
- // throws Exception
- $mock->first_method()->second_method();
+  $mock->first_method()->second_method(2,3); // returns 1
+  $mock->first_method()->second_method(2,3,4); // returns 2
+  $mock->first_method(1)->second_method(2,3,4); // returns 3
+  $mock->first_method(1,2,3)->second_method(1,2)->third_method(); // return 4
 ```
 The `when_chain_methods` function is used chain methods for stubbing, using the same actions as the single function stubbing, return or throw.
 
