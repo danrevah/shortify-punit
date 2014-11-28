@@ -1,8 +1,11 @@
 <?php
 namespace ShortifyPunit;
 
+use ShortifyPunit\Mock\MockInterface;
 use ShortifyPunit\Enums\MockAction;
 use ShortifyPunit\Exceptions\ExceptionFactory;
+use ShortifyPunit\Stub\WhenCase;
+use ShortifyPunit\Stub\WhenChainCase;
 
 class ShortifyPunit
 {
@@ -32,7 +35,7 @@ class ShortifyPunit
     /**
      * @var array of allowed friend classes, that could access private methods of this class
      */
-    private static $friendClasses = ['ShortifyPunit\ShortifyPunitWhenCase', 'ShortifyPunit\ShortifyPunitMockClassOnTheFly'];
+    private static $friendClasses = ['ShortifyPunit\Stub\WhenCase', 'ShortifyPunit\Mock\MockClassOnTheFly', 'ShortifyPunit\Stub\WhenChainCase'];
 
     /**
      * Call static function is used to detect calls to protected & private methods
@@ -60,7 +63,7 @@ class ShortifyPunit
 
         $reflection = new \ReflectionClass($backTrace[2]['class']);
 
-        if ( ! $reflection->implementsInterface("{$namespace}\\{$basename}MockInterface") &&
+        if ( ! $reflection->implementsInterface("{$namespace}\\Mock\\MockInterface") &&
             isset($backTrace[2]['class']) && ! in_array($backTrace[2]['class'], self::$friendClasses))
         {
             throw self::generateException("{$class} is not a friend class!");
@@ -98,7 +101,7 @@ class ShortifyPunit
         $className = $reflection->getName();
         $methods = $reflection->getMethods();
         $extends = $reflection->isInterface() ? 'implements' : 'extends';
-        $marker = $reflection->isInterface() ? ", {$namespace}\\{$basename}MockInterface" : "implements {$namespace}\\{$basename}MockInterface";
+        $marker = $reflection->isInterface() ? ", {$namespace}\\Mock\\MockInterface" : "implements {$namespace}\\Mock\\MockInterface";
 
 
         $namespaceDeclaration = $mockedNamespace ? "namespace $mockedNamespace;" : '';
@@ -138,7 +141,6 @@ EOT;
             $returnsByReference = $method->returnsReference() ? '&' : '';
 
             $methodParams = [];
-            $callParams = [];
 
             // Get method parameters
             foreach ($method->getParameters() as $param)
@@ -193,71 +195,92 @@ EOT;
      */
     public static function when($class)
     {
-        if ($class instanceof ShortifyPunitMockInterface) {
-            return new ShortifyPunitWhenCase(get_class($class), $class->mockInstanceId);
+        if ($class instanceof MockInterface) {
+            return new WhenCase(get_class($class), $class->mockInstanceId);
         }
 
         return NULL;
     }
 
+
     /**
-     * Setting up a when concatenation case
-     * @param $class
-     * @param array $methods
-     * @param $returnType
-     * @param $returnValue
-     * @internal param $value
+     * Setting up a chained mock response, function is called from mocked classes using `friend classes` style
+     *
+     * @param $chainedMethodsBefore
+     * @param $currentMethod
+     * @param $args
+     * @return null
      */
-    public static function when_chain_methods($class, array $methods, $returnType, $returnValue)
+    private static function __create_chain_response($chainedMethodsBefore, $currentMethod, $args)
     {
-        if (count($methods) < 2) {
-            throw self::generateException('When using concatenation must use at least 2 methods!');
-        }
+        $rReturnValues = &self::$returnValues;
+        $currentMethodName = key($currentMethod);
 
-        $reversedMethods = array_reverse($methods);
-
-        // pop out the last element (=first before using array_reverse)
-        list($value, $firstElementFunctionName) = array(end($reversedMethods), key($reversedMethods));
-        $firstElement[$firstElementFunctionName] = $value;
-        array_pop($reversedMethods);
-
-        $returnValuesKey = "{$firstElementFunctionName}_Concatenation";
-
-        $lastClass = false;
-
-        // now after the array_pop this will loop only the functions without the first method
-        foreach ($reversedMethods as $method => $args)
+        // Check return values chain
+        foreach ($chainedMethodsBefore as $chainedMethod)
         {
-            if ( ! is_string($method)) {
-                throw self::generateException('Invalid method name!');
-            }
+            $chainedMethodName = key($chainedMethod);
+            $chainedMethodArgs = $chainedMethod[$chainedMethodName];
 
-            $fakeClass = new ShortifyPunitMockClassOnTheFly();
+            $key = $chainedMethodName.serialize($chainedMethodArgs);
 
-            // if this concatenated object method doesn't have already has an instance id, use it instead of re-creating
-            $instanceId = ( ! isset(self::$returnValues[$returnValuesKey][$method])) ? ++self::$instanceId : key(self::$returnValues[$returnValuesKey][$method]);
-
-            // if last function in the concatenation then the return value
-            if ($lastClass === false) {
-                self::setWhenMockResponse($returnValuesKey, $instanceId, $method, $args, $returnType, $returnValue);
-            }
-            // otherwise return the last MockOnTheFly class
-            else {
-                self::setWhenMockResponse($returnValuesKey, $instanceId, $method, $args, $returnType, $lastClass);
-            }
-
-            // Create fake method
-            $fakeClass->$method = function() use ($returnValue, $args, $instanceId, $method, $returnValuesKey) {
-                return ShortifyPunit::__create_response($returnValuesKey, $instanceId, $method, func_get_args());
-            };
-
-            $lastClass = $fakeClass;
+            $rReturnValues = &$rReturnValues[$key];
         }
 
-        if ($class instanceof ShortifyPunitMockInterface) {
-            $whenCase = new ShortifyPunitWhenCase(get_class($class), $class->mockInstanceId, key($firstElement));
-            $whenCase->setMethod(current($firstElement), MockAction::RETURNS, $lastClass);
+        // Check current method exist in return values chain
+        $key = $currentMethodName.serialize($args);
+
+        if ( ! array_key_exists($key, $rReturnValues)) {
+            return NULL;
         }
+
+        $response = $rReturnValues[$key];
+
+        if ( ! array_key_exists('response', $response)) {
+            throw self::generateException('Create chain response corrupt response return values');
+        }
+
+        $response = $response['response'];
+
+        if ( ! array_key_exists('action', $response) || ! array_key_exists('value', $response)) {
+            throw self::generateException('Create chain response corrupt response return values');
+        }
+
+        $action = $response['action'];
+        $value = $response['value'];
+
+
+        if ($action == MockAction::THROWS) {
+            throw is_object($value) ? $value : new $value;
+        }
+
+        return $value;
+    }
+
+    /**
+     * Used to stub chained methods
+     * @param $mock
+     * @return ShortifyPunitWhenChainCase
+     */
+    public static function when_chain_methods($mock)
+    {
+        return new WhenChainCase($mock);
+    }
+
+    /**
+     * @return array
+     */
+    public static function getReturnValues()
+    {
+        return self::$returnValues;
+    }
+
+    /**
+     * @param $returnValues
+     */
+    public static function setReturnValues($returnValues)
+    {
+        self::$returnValues = $returnValues;
     }
 
     /**
@@ -313,5 +336,21 @@ EOT;
         //if ($return['action'] == MockAction::RETURNS) {
         return $return['value'];
         //}
+    }
+
+    /**
+     * Adding chained response to ReturnValues array
+     *
+     * @param $response
+     */
+    private static function addChainedResponse($response)
+    {
+        $firstChainedMethodName = key($response);
+
+        if (isset(self::$returnValues[$firstChainedMethodName])) {
+            self::$returnValues[$firstChainedMethodName] = array_replace_recursive(self::$returnValues[$firstChainedMethodName],$response[$firstChainedMethodName]);
+        } else {
+            self::$returnValues[$firstChainedMethodName] = $response[$firstChainedMethodName];
+        }
     }
 }

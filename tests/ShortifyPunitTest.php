@@ -15,6 +15,14 @@ class SimpleClassForMocking
         return 2;
     }
 
+    public function third_method() {
+        return 3;
+    }
+
+    public function fourth_method() {
+        return 4;
+    }
+
     public function params(array $arr, SimpleClassForMocking $instance, $code = 1)
     {
 
@@ -180,76 +188,92 @@ class ShortifyPunitTest extends \PHPUnit_Framework_TestCase
      * @checks return values of concatenation functions, and checking that expect of the first function
      * no other function has been manipulated so the user could mock other values in case of direct call
      */
-    public function testWhenConcatenation()
+    public function testChainStubbing()
     {
         $mock = ShortifyPunit::mock('SimpleClassForMocking');
 
-        ShortifyPunit::when($mock)->second_method()->returns('second');
-        $this->assertEquals('second', $mock->second_method());
+        ShortifyPunit::when_chain_methods($mock)->first_method()->second_method(2,3)->returns(1);
+        ShortifyPunit::when_chain_methods($mock)->first_method()->second_method(2,3,4)->returns(2);
+        ShortifyPunit::when_chain_methods($mock)->first_method(1)->second_method(2,3,4)->returns(3);
+        ShortifyPunit::when_chain_methods($mock)->first_method(1,2)->second_method(2,3,4)->returns(4);
+        ShortifyPunit::when_chain_methods($mock)->first_method(1,2)->second_method(1,8,9)->returns(5);
+        ShortifyPunit::when_chain_methods($mock)->first_method(1,2,3)->second_method(1,2)->third_method()->returns(6);
+        ShortifyPunit::when_chain_methods($mock)->first_method(1,2)->second_method(1,3)->third_method()->returns(7);
+        ShortifyPunit::when_chain_methods($mock)->first_method(1,2)->second_method(1,8)->third_method()->fourth_method(2)->returns(8);
 
-        ShortifyPunit::when_chain_methods($mock, array('first_method' => array(),
-                                                'second_method' => array()),
-                                   MockAction::RETURNS,
-                                   'empty');
+        $this->assertEquals($mock->first_method()->second_method(2,3), 1);
+        $this->assertEquals($mock->first_method()->second_method(2,3,4), 2);
+        $this->assertEquals($mock->first_method(1)->second_method(2,3,4), 3);
+        $this->assertEquals($mock->first_method(1,2)->second_method(2,3,4), 4);
+        $this->assertEquals($mock->first_method(1,2)->second_method(1,8,9), 5);
+        $this->assertEquals($mock->first_method(1,2,3)->second_method(1,2)->third_method(), 6);
+        $this->assertEquals($mock->first_method(1,2)->second_method(1,3)->third_method(), 7);
+        $this->assertEquals($mock->first_method(1,2)->second_method(1,8)->third_method()->fourth_method(2), 8);
 
-        // asserting that first method returns `MockClassOnTheFly` object
-        $this->assertInstanceOf('ShortifyPunit\ShortifyPunitMockClassOnTheFly', $mock->first_method());
+        $this->assertNull($mock->first_method(1,2)->second_method());
+        $this->assertNull($mock->first_method(1,2)->second_method(1,8)->third_method(312321231));
+    }
 
-        // asserting concatenation
-        $this->assertEquals('empty', $mock->first_method()->second_method());
+    /**
+     * @expectedException Exception
+     */
+    public function testChainStubbingThrow()
+    {
+        $mock = ShortifyPunit::mock('SimpleClassForMocking');
 
-        // checking that second_method wasn't changed due to concatenation
-        $this->assertEquals('second', $mock->second_method());
+        ShortifyPunit::when_chain_methods($mock)->first_method()->second_method(2,3)->throws('Exception');
 
-        // testing with parameters
-        ShortifyPunit::when_chain_methods($mock, array('first_method' => array(1,2),
-                'second_method' => array(3,4)),
-            MockAction::RETURNS, 'two parameters');
+        $mock->first_method()->second_method(2,3);
+    }
 
-        ShortifyPunit::when_chain_methods($mock, array('first_method' => array(1,2),
-                'second_method' => array(3,4,5)),
-            MockAction::RETURNS, 'three parameters');
 
-        $this->assertEquals('two parameters', $mock->first_method(1,2)->second_method(3,4));
-        $this->assertEquals('three parameters', $mock->first_method(1,2)->second_method(3,4, 5));
-        $this->assertEquals('empty', $mock->first_method()->second_method()); // still keeping the last value
+    /**
+     * @expectedException PHPUnit_Framework_AssertionFailedError
+     */
+    public function testChainNoReturnValue()
+    {
+        $mock = ShortifyPunit::mock('SimpleClassForMocking');
 
-        // three chaining
-        ShortifyPunit::when_chain_methods($mock, array('first_method' => array(1,2,5,6),
-                'second_method' => array(3,4,5),
-                'params' => array(array(), 1, new SimpleClassForMocking())),
-            MockAction::RETURNS, 'three methods');
+        ShortifyPunit::when_chain_methods($mock)->first_method()->second_method(2,3)->returns();
+    }
 
-        $this->assertEquals('three methods', $mock->first_method(1,2,5,6)->second_method(3,4,5)->params(array(), 1, new SimpleClassForMocking()));
+    /**
+     * @expectedException Exception
+     */
+    public function testChainStubbingCorruptData()
+    {
+        $mock = ShortifyPunit::mock('SimpleClassForMocking');
+
+        ShortifyPunit::when_chain_methods($mock)->first_method()->second_method(2,3)->throws('Exception');
+
+        $mock->first_method()->second_method(2,3);
+    }
+
+    /**
+     * @expectedException PHPUnit_Framework_AssertionFailedError
+     */
+    public function testChainStubbingCorruptDataReturnValue()
+    {
+        $mock = ShortifyPunit::mock('SimpleClassForMocking');
+
+        ShortifyPunit::when_chain_methods($mock)->first_method()->second_method(2,3)->returns(1);
+        $response = ShortifyPunit::getReturnValues();
+        $response['first_methoda:0:{}'] = ['second_methoda:2:{i:0;i:2;i:1;i:3;}'=>['response' => []]];
+        ShortifyPunit::setReturnValues($response);
+        $mock->first_method()->second_method(2,3);
     }
 
     /**
      * @expectedException \PHPUnit_Framework_AssertionFailedError
      */
-    public function testWhenConcatenationMinimumMethod()
+    public function testReturnNotAllowedArguments()
     {
         $mock = ShortifyPunit::mock('SimpleClassForMocking');
 
-        ShortifyPunit::when_chain_methods($mock, array('first_method' => array()), MockAction::RETURNS, 'abc');
-    }
-
-    /**
-     * @expectedException \PHPUnit_Framework_AssertionFailedError
-     */
-    public function testWhenConcatenationFakeMethodName()
-    {
-        $mock = ShortifyPunit::mock('SimpleClassForMocking');
-
-        ShortifyPunit::when_chain_methods($mock, array('fake method name' => array()), MockAction::RETURNS, 'abc');
-    }
-
-    /**
-     * @expectedException \PHPUnit_Framework_AssertionFailedError
-     */
-    public function testWhenConcatenationMethodNotString()
-    {
-        $mock = ShortifyPunit::mock('SimpleClassForMocking');
-
-        ShortifyPunit::when_chain_methods($mock, array(1, 2), MockAction::RETURNS, 'abc');
+        ShortifyPunit::when_chain_methods($mock)->first_method()->second_method(2,3)->returns(1);
+        $response = ShortifyPunit::getReturnValues();
+        $response['first_methoda:0:{}'] = ['second_methoda:2:{i:0;i:2;i:1;i:3;}'=>[]];
+        ShortifyPunit::setReturnValues($response);
+        $mock->first_method()->second_method(2,3);
     }
 }
