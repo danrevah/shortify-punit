@@ -63,6 +63,7 @@ class WhenCase
             {
                 case MockAction::THROWS:
                 case MockAction::RETURNS:
+                case MockAction::CALLBACK:
                     $this->setMethod($this->args, $method, $value);
                     break;
 

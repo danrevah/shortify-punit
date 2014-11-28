@@ -111,6 +111,12 @@ class ShortifyPunitTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(1, $mock->params(array(), $mock, 'abc'));
     }
 
+    public function testCallbackReturnValues()
+    {
+        $mock = ShortifyPunit::mock('SimpleClassForMocking');
+        ShortifyPunit::when($mock)->first_method()->callback(function() {});
+        $mock->first_method();
+    }
     /**
      * @checks when which is not instance of Mock
      */
@@ -297,6 +303,7 @@ class ShortifyPunitTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($mock->first_method()->second_method(1), 1);
         $this->assertEquals($mock->first_method()->second_method(array()), 1);
         $this->assertNull($mock->first_method('foo'));
+        $this->assertNull($mock->first_method()->second_method('foo bar', new Exception()));
 
         $this->assertEquals($mock->first_method(1)->second_method(1), 2);
         $this->assertNull($mock->first_method(1)->second_method('bar'));

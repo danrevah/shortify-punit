@@ -279,6 +279,18 @@ EOT;
 
         $response = $response['response'];
 
+        return self::createResponse($response, $args);
+    }
+
+    /**
+     * Creating response by response options (Return/Throw/Callback)
+     *
+     * @param $response
+     * @param $arguments
+     * @return mixed
+     */
+    private static function createResponse($response, $arguments)
+    {
         if ( ! array_key_exists('action', $response) || ! array_key_exists('value', $response)) {
             throw self::generateException('Create chain response corrupt response return values');
         }
@@ -289,6 +301,9 @@ EOT;
 
         if ($action == MockAction::THROWS) {
             throw is_object($value) ? $value : new $value;
+        }
+        else if ($action == MockAction::CALLBACK) {
+            return call_user_func_array($value, $arguments);
         }
 
         return $value;
@@ -352,13 +367,7 @@ EOT;
 
         $return = self::$returnValues[$className][$methodName][$instanceId][$args];
 
-        if ($return['action'] == MockAction::THROWS) {
-            throw is_object($return['value']) ? $return['value'] : new $return['value'];
-        }
-
-        //if ($return['action'] == MockAction::RETURNS) {
-        return $return['value'];
-        //}
+        return self::createResponse($return, $arguments);
     }
 
     /**
