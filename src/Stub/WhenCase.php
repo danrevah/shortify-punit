@@ -59,17 +59,13 @@ class WhenCase
 
             $value = $args[0];
 
-            // set return / throw method
-            switch($method)
-            {
-                case MockAction::THROWS:
-                case MockAction::RETURNS:
-                case MockAction::CALLBACK:
-                    $this->setMethod($this->args, $method, $value);
-                    break;
 
-                default:
-                    throw static::generateException("`{$method}` no such action!");
+            // set return / throw method
+            if (in_array($method, array(MockAction::CALLBACK, MockAction::RETURNS, MockAction::CALLBACK))) {
+                $this->setMethod($this->args, $method, $value);
+            }
+            else {
+                throw static::generateException("`{$method}` no such action!");
             }
         }
 
