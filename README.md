@@ -1,10 +1,11 @@
 #ShortifyPunit &nbsp; [![Build Status](https://travis-ci.org/danrevah/ShortifyPunit.svg?branch=master)](https://travis-ci.org/danrevah/ShortifyPunit)  [![Coverage Status](https://coveralls.io/repos/danrevah/ShortifyPunit/badge.png?branch=master)](https://coveralls.io/repos/danrevah/ShortifyPunit/badge.png?branch=master)
-> PHP Simple mocking library, **v0.1.2**
+> PHP Simple mocking library, **v0.1.3**
 
  * [Installation](#installation)
  * [Mocking](#mocking-examples)
  * [Stubbing](#stubbing)
  * [Stubbing Method Chaning](#stubbing-method-chaining)
+ * [Argument Matcher](#argument-matcher)
 
 ## Installation
 
@@ -14,8 +15,8 @@ have Composer, you can download it from [http://getcomposer.org/](http://getcomp
  * Run either of the following commands, depending on your environment:
 
 ```
-$ composer global require danrevah/spu:dev-master
-$ php composer.phar global require danrevah/spu:dev-master
+$ composer global require danrevah/shortifypunit:dev-master
+$ php composer.phar global require danrevah/shortifypunit:dev-master
 ```
 
 ## Mocking Examples
@@ -78,3 +79,43 @@ The `when` function is used to stubbing methods with specific parameters, using 
 ```
 The `when_chain_methods` function is used chain methods for stubbing, using the same actions as the single function stubbing, return or throw.
 
+
+## Argument Matcher
+
+ShortifyPunit allows the use of [Hamcrest]https://github.com/hamcrest/hamcrest-php) matchers on any argument. Hamcrest is a library of "matching functions" that, given a value, return true if that value
+matches some rule.
+
+ShortifyPunit matchers are included by default.
+
+Examples:
+
+```php
+class Foo
+{
+	public function Bar($arg){
+	}
+}
+
+$stub = ShortifyPunit::mock('Foo');
+ShortifyPunit::when($stub)->Bar(anything())->return('FooBar');
+```
+
+Some common Hamcrest matchers:
+
+- Core
+	* `anything` - always matches, useful if you don't care what the object under test is
+- Logical
+	* `allOf` - matches if all matchers match, short circuits (like PHP &&)
+	* `anyOf` - matches if any matchers match, short circuits (like PHP ||)
+	* `not` - matches if the wrapped matcher doesn't match and vice versa
+- Object
+	* `equalTo` - test object equality using the == operator
+	* `anInstanceOf` - test type
+	* `notNullValue`, `nullValue` - test for null
+- Number
+	* `closeTo` - test floating point values are close to a given value
+	* `greaterThan`, `greaterThanOrEqualTo`, `lessThan`, `lessThanOrEqualTo` - test ordering
+- Text
+	* `equalToIgnoringCase` - test string equality ignoring case
+	* `equalToIgnoringWhiteSpace` - test string equality ignoring differences in runs of whitespace
+	* `containsString`, `endsWith`, `startsWith` - test string matching
