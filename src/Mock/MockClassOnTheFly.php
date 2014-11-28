@@ -5,7 +5,7 @@ use ShortifyPunit\Exceptions\ExceptionFactory;
 /**
  * Class MockClassOnTheFly
  * @package ShortifyPunit\Mock
- * @desc used on `when_chain_methods` function, creating anonymous functions on-the-fly
+ * @desc used on `when_chain` function, creating anonymous functions on-the-fly
  */
 class MockClassOnTheFly
 {

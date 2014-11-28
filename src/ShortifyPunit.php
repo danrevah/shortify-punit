@@ -28,6 +28,12 @@ class ShortifyPunit
 
     /**
      * @var array - return values of mocked functions by instance id
+     *
+     * Nesting:
+     *   - Single Stub: [className][methodName][instanceId][args] = array('action' => ..., 'value' => ...)
+     *   - Multiple Stubbing:
+     *     - For the first method using the single stub
+     *     - For the rest of the methods: [methodName][args]...[methodName][args]... = array('response' => array('action' => ..., 'value' => ...))
      */
     private static $returnValues = [];
 
@@ -58,7 +64,6 @@ class ShortifyPunit
 
         $backTrace = debug_backtrace();
 
-        $basename = self::$classBasePrefix;
         $namespace = self::$namespace;
 
         $reflection = new \ReflectionClass($backTrace[2]['class']);
@@ -191,7 +196,7 @@ EOT;
      * Setting up a when case
      *
      * @param $class
-     * @return ShortifyPunitWhenCase
+     * @return NULL|WhenCase
      */
     public static function when($class)
     {
@@ -202,6 +207,31 @@ EOT;
         return NULL;
     }
 
+    /**
+     * Used to stub chained methods
+     * @param $mock
+     * @return WhenChainCase
+     */
+    public static function when_chain($mock)
+    {
+        return new WhenChainCase($mock);
+    }
+
+    /**
+     * @return array
+     */
+    public static function getReturnValues()
+    {
+        return self::$returnValues;
+    }
+
+    /**
+     * @param $returnValues
+     */
+    public static function setReturnValues($returnValues)
+    {
+        self::$returnValues = $returnValues;
+    }
 
     /**
      * Setting up a chained mock response, function is called from mocked classes using `friend classes` style
@@ -222,19 +252,18 @@ EOT;
             $chainedMethodName = key($chainedMethod);
             $chainedMethodArgs = $chainedMethod[$chainedMethodName];
 
-            $key = $chainedMethodName.serialize($chainedMethodArgs);
+            $serializedChainMethodArgs = serialize($chainedMethodArgs);
 
-            $rReturnValues = &$rReturnValues[$key];
+            $rReturnValues = &$rReturnValues[$chainedMethodName][$serializedChainMethodArgs];
         }
 
         // Check current method exist in return values chain
-        $key = $currentMethodName.serialize($args);
-
-        if ( ! array_key_exists($key, $rReturnValues)) {
+        $serializedArgs = serialize($args);
+        if ( ! isset($rReturnValues[$currentMethodName][$serializedArgs])) {
             return NULL;
         }
 
-        $response = $rReturnValues[$key];
+        $response = $rReturnValues[$currentMethodName][$serializedArgs];
 
         if ( ! array_key_exists('response', $response)) {
             throw self::generateException('Create chain response corrupt response return values');
@@ -255,32 +284,6 @@ EOT;
         }
 
         return $value;
-    }
-
-    /**
-     * Used to stub chained methods
-     * @param $mock
-     * @return ShortifyPunitWhenChainCase
-     */
-    public static function when_chain_methods($mock)
-    {
-        return new WhenChainCase($mock);
-    }
-
-    /**
-     * @return array
-     */
-    public static function getReturnValues()
-    {
-        return self::$returnValues;
-    }
-
-    /**
-     * @param $returnValues
-     */
-    public static function setReturnValues($returnValues)
-    {
-        self::$returnValues = $returnValues;
     }
 
     /**

@@ -66,10 +66,10 @@ The `when` function is used to stubbing methods with specific parameters, using 
  // Creating a new mock for SimpleClassForMocking
  $mock = ShortifyPunit::mock('SimpleClassForMocking');
 
-  ShortifyPunit::when_chain_methods($mock)->first_method()->second_method(2,3)->returns(1);
-  ShortifyPunit::when_chain_methods($mock)->first_method()->second_method(2,3,4)->returns(2);
-  ShortifyPunit::when_chain_methods($mock)->first_method(1)->second_method(2,3,4)->returns(3);
-  ShortifyPunit::when_chain_methods($mock)->first_method(1,2,3)->second_method(1,2)->third_method()->returns(4);
+  ShortifyPunit::when_chain($mock)->first_method()->second_method(2,3)->returns(1);
+  ShortifyPunit::when_chain($mock)->first_method()->second_method(2,3,4)->returns(2);
+  ShortifyPunit::when_chain($mock)->first_method(1)->second_method(2,3,4)->returns(3);
+  ShortifyPunit::when_chain($mock)->first_method(1,2,3)->second_method(1,2)->third_method()->returns(4);
   
   $mock->first_method()->second_method(2,3); // returns 1
   $mock->first_method()->second_method(2,3,4); // returns 2

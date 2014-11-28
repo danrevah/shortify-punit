@@ -192,14 +192,14 @@ class ShortifyPunitTest extends \PHPUnit_Framework_TestCase
     {
         $mock = ShortifyPunit::mock('SimpleClassForMocking');
 
-        ShortifyPunit::when_chain_methods($mock)->first_method()->second_method(2,3)->returns(1);
-        ShortifyPunit::when_chain_methods($mock)->first_method()->second_method(2,3,4)->returns(2);
-        ShortifyPunit::when_chain_methods($mock)->first_method(1)->second_method(2,3,4)->returns(3);
-        ShortifyPunit::when_chain_methods($mock)->first_method(1,2)->second_method(2,3,4)->returns(4);
-        ShortifyPunit::when_chain_methods($mock)->first_method(1,2)->second_method(1,8,9)->returns(5);
-        ShortifyPunit::when_chain_methods($mock)->first_method(1,2,3)->second_method(1,2)->third_method()->returns(6);
-        ShortifyPunit::when_chain_methods($mock)->first_method(1,2)->second_method(1,3)->third_method()->returns(7);
-        ShortifyPunit::when_chain_methods($mock)->first_method(1,2)->second_method(1,8)->third_method()->fourth_method(2)->returns(8);
+        ShortifyPunit::when_chain($mock)->first_method()->second_method(2,3)->returns(1);
+        ShortifyPunit::when_chain($mock)->first_method()->second_method(2,3,4)->returns(2);
+        ShortifyPunit::when_chain($mock)->first_method(1)->second_method(2,3,4)->returns(3);
+        ShortifyPunit::when_chain($mock)->first_method(1,2)->second_method(2,3,4)->returns(4);
+        ShortifyPunit::when_chain($mock)->first_method(1,2)->second_method(1,8,9)->returns(5);
+        ShortifyPunit::when_chain($mock)->first_method(1,2,3)->second_method(1,2)->third_method()->returns(6);
+        ShortifyPunit::when_chain($mock)->first_method(1,2)->second_method(1,3)->third_method()->returns(7);
+        ShortifyPunit::when_chain($mock)->first_method(1,2)->second_method(1,8)->third_method()->fourth_method(2)->returns(8);
 
         $this->assertEquals($mock->first_method()->second_method(2,3), 1);
         $this->assertEquals($mock->first_method()->second_method(2,3,4), 2);
@@ -221,7 +221,7 @@ class ShortifyPunitTest extends \PHPUnit_Framework_TestCase
     {
         $mock = ShortifyPunit::mock('SimpleClassForMocking');
 
-        ShortifyPunit::when_chain_methods($mock)->first_method()->second_method(2,3)->throws('Exception');
+        ShortifyPunit::when_chain($mock)->first_method()->second_method(2,3)->throws('Exception');
 
         $mock->first_method()->second_method(2,3);
     }
@@ -234,7 +234,7 @@ class ShortifyPunitTest extends \PHPUnit_Framework_TestCase
     {
         $mock = ShortifyPunit::mock('SimpleClassForMocking');
 
-        ShortifyPunit::when_chain_methods($mock)->first_method()->second_method(2,3)->returns();
+        ShortifyPunit::when_chain($mock)->first_method()->second_method(2,3)->returns();
     }
 
     /**
@@ -244,7 +244,7 @@ class ShortifyPunitTest extends \PHPUnit_Framework_TestCase
     {
         $mock = ShortifyPunit::mock('SimpleClassForMocking');
 
-        ShortifyPunit::when_chain_methods($mock)->first_method()->second_method(2,3)->throws('Exception');
+        ShortifyPunit::when_chain($mock)->first_method()->second_method(2,3)->throws('Exception');
 
         $mock->first_method()->second_method(2,3);
     }
@@ -256,9 +256,9 @@ class ShortifyPunitTest extends \PHPUnit_Framework_TestCase
     {
         $mock = ShortifyPunit::mock('SimpleClassForMocking');
 
-        ShortifyPunit::when_chain_methods($mock)->first_method()->second_method(2,3)->returns(1);
+        ShortifyPunit::when_chain($mock)->first_method()->second_method(2,3)->returns(1);
         $response = ShortifyPunit::getReturnValues();
-        $response['first_methoda:0:{}'] = ['second_methoda:2:{i:0;i:2;i:1;i:3;}'=>['response' => []]];
+        $response['first_method']['a:0:{}']['second_method']['a:2:{i:0;i:2;i:1;i:3;}'] = ['response' => []];
         ShortifyPunit::setReturnValues($response);
         $mock->first_method()->second_method(2,3);
     }
@@ -270,9 +270,9 @@ class ShortifyPunitTest extends \PHPUnit_Framework_TestCase
     {
         $mock = ShortifyPunit::mock('SimpleClassForMocking');
 
-        ShortifyPunit::when_chain_methods($mock)->first_method()->second_method(2,3)->returns(1);
+        ShortifyPunit::when_chain($mock)->first_method()->second_method(2,3)->returns(1);
         $response = ShortifyPunit::getReturnValues();
-        $response['first_methoda:0:{}'] = ['second_methoda:2:{i:0;i:2;i:1;i:3;}'=>[]];
+        $response['first_method']['a:0:{}']['second_method'] = ['a:2:{i:0;i:2;i:1;i:3;}' => []];
         ShortifyPunit::setReturnValues($response);
         $mock->first_method()->second_method(2,3);
     }

@@ -103,12 +103,12 @@ class WhenChainCase
             $chainedMethodName = key($chainedMethod);
             $chainedMethodArgs = $chainedMethod[$chainedMethodName];
 
-            $key = $chainedMethodName.serialize($chainedMethodArgs);
-            $rResponse[$key] = [];
-            $rResponse = &$rResponse[$key];
+            $serializedChainedMethodArgs = serialize($chainedMethodArgs);
+            $rResponse[$chainedMethodName][$serializedChainedMethodArgs] = [];
+            $rResponse = &$rResponse[$chainedMethodName][$serializedChainedMethodArgs];
         }
 
-        $rResponse[$currentMethodName.serialize(current($currentMethod))] = ['response' => ['action' => $action, 'value' => $lastValue]];
+        $rResponse[$currentMethodName][serialize(current($currentMethod))] = ['response' => ['action' => $action, 'value' => $lastValue]];
 
         ShortifyPunit::addChainedResponse($response);
     }
