@@ -19,5 +19,6 @@
     },
     "autoload": {
         "psr-4": { "ShortifyPunit\\": "src/" }
-    }
+    },
+    "minimum-stability": "dev"
 }
