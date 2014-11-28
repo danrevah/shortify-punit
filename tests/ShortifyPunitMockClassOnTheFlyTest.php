@@ -1,5 +1,5 @@
 <?php
-use ShortifyPunit\ShortifyPunitMockClassOnTheFly;
+use ShortifyPunit\Mock\MockClassOnTheFly;
 
 class ShortifyPunitMockClassOnTheFlyTest extends \PHPUnit_Framework_TestCase
 {
@@ -10,7 +10,7 @@ class ShortifyPunitMockClassOnTheFlyTest extends \PHPUnit_Framework_TestCase
      */
     public function testCreateFunctionOnTheFly()
     {
-        $fakeClass = new ShortifyPunitMockClassOnTheFly();
+        $fakeClass = new MockClassOnTheFly();
 
         $some_method_1 = 'some_method_1';
         $some_method_2 = 'some_method_2';
@@ -32,7 +32,7 @@ class ShortifyPunitMockClassOnTheFlyTest extends \PHPUnit_Framework_TestCase
      */
     public function testMethodWhenCallsAllowedActions()
     {
-        $fakeClass = new ShortifyPunitMockClassOnTheFly();
+        $fakeClass = new MockClassOnTheFly();
 
         $missing_method_test = 'missing_method_test';
         $this->assertNull($fakeClass->$missing_method_test());

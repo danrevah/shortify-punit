@@ -1,6 +1,6 @@
 <?php
 use ShortifyPunit\ShortifyPunit;
-use ShortifyPunit\ShortifyPunitWhenCase;
+use ShortifyPunit\Stub\WhenCase;
 
 class ShortifyPunitWhenCaseTest extends \PHPUnit_Framework_TestCase
 {
@@ -11,7 +11,7 @@ class ShortifyPunitWhenCaseTest extends \PHPUnit_Framework_TestCase
     public function testMethodWhenCalls()
     {
         $mock = ShortifyPunit::mock('\Exception');
-        $whenCase = new ShortifyPunitWhenCase(get_class($mock), $mock->mockInstanceId);
+        $whenCase = new WhenCase(get_class($mock), $mock->mockInstanceId);
         $whenCase->test(array());
     }
 
@@ -21,7 +21,7 @@ class ShortifyPunitWhenCaseTest extends \PHPUnit_Framework_TestCase
     public function testMethodWhenCallsAllowedActions()
     {
         $mock = ShortifyPunit::mock('\Exception');
-        $whenCase = new ShortifyPunitWhenCase(get_class($mock), $mock->mockInstanceId, 'abc');
+        $whenCase = new WhenCase(get_class($mock), $mock->mockInstanceId, 'abc');
         $whenCase->test();
     }
 
