@@ -82,7 +82,7 @@ The `when_chain_methods` function is used chain methods for stubbing, using the 
 
 ## Argument Matcher
 
-ShortifyPunit allows the use of [Hamcrest-PHP](#https://github.com/hamcrest/hamcrest-php) matchers on any argument. Hamcrest is a library of "matching functions" that, given a value, return true if that value
+ShortifyPunit allows the use of Hamcrest PHP (https://github.com/hamcrest/hamcrest-php) matchers on any argument. Hamcrest is a library of "matching functions" that, given a value, return true if that value
 matches some rule.
 
 ShortifyPunit matchers are included by default.
