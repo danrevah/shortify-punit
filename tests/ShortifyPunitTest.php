@@ -15,6 +15,14 @@ class SimpleClassForMocking
         return 2;
     }
 
+    public function third_method() {
+        return 3;
+    }
+
+    public function fourth_method() {
+        return 4;
+    }
+
     public function params(array $arr, SimpleClassForMocking $instance, $code = 1)
     {
 
@@ -251,5 +259,45 @@ class ShortifyPunitTest extends \PHPUnit_Framework_TestCase
         $mock = ShortifyPunit::mock('SimpleClassForMocking');
 
         ShortifyPunit::when_chain_methods($mock, array(1, 2), MockAction::RETURNS, 'abc');
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    public function testNewChainStubbing()
+    {
+        $mock = ShortifyPunit::mock('SimpleClassForMocking');
+
+        ShortifyPunit::whenChainStubbing($mock)->first_method()->second_method(2,3)->returns(1);
+        ShortifyPunit::whenChainStubbing($mock)->first_method()->second_method(2,3,4)->returns(2);
+        ShortifyPunit::whenChainStubbing($mock)->first_method(1)->second_method(2,3,4)->returns(3);
+        ShortifyPunit::whenChainStubbing($mock)->first_method(1,2)->second_method(2,3,4)->returns(4);
+        ShortifyPunit::whenChainStubbing($mock)->first_method(1,2)->second_method(1,8,9)->returns(5);
+        ShortifyPunit::whenChainStubbing($mock)->first_method(1,2,3)->second_method(1,2)->third_method()->returns(6);
+        ShortifyPunit::whenChainStubbing($mock)->first_method(1,2)->second_method(1,3)->third_method()->returns(7);
+        ShortifyPunit::whenChainStubbing($mock)->first_method(1,2)->second_method(1,8)->third_method()->fourth_method(2)->returns(8);
+
+        $this->assertEquals($mock->first_method()->second_method(2,3), 1);
+        $this->assertEquals($mock->first_method()->second_method(2,3,4), 2);
+        $this->assertEquals($mock->first_method(1)->second_method(2,3,4), 3);
+        $this->assertEquals($mock->first_method(1,2)->second_method(2,3,4), 4);
+        $this->assertEquals($mock->first_method(1,2)->second_method(1,8,9), 5);
+        $this->assertEquals($mock->first_method(1,2,3)->second_method(1,2)->third_method(), 6);
+        $this->assertEquals($mock->first_method(1,2)->second_method(1,3)->third_method(), 7);
+        $this->assertEquals($mock->first_method(1,2)->second_method(1,8)->third_method()->fourth_method(2), 8);
     }
 }

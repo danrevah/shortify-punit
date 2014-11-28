@@ -22,7 +22,8 @@ class ShortifyPunitMockClassOnTheFly
     public function __call($key, $args)
     {
         if ( ! isset($this->methods[$key])) {
-            throw static::generateException("`{$key}` no such method!");
+            // Returns NULL if method not found
+            return NULL;
         }
 
         return call_user_func_array($this->methods[$key], $args);

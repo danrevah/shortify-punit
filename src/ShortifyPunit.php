@@ -32,7 +32,7 @@ class ShortifyPunit
     /**
      * @var array of allowed friend classes, that could access private methods of this class
      */
-    private static $friendClasses = ['ShortifyPunit\ShortifyPunitWhenCase', 'ShortifyPunit\ShortifyPunitMockClassOnTheFly'];
+    private static $friendClasses = ['ShortifyPunit\ShortifyPunitWhenCase', 'ShortifyPunit\ShortifyPunitMockClassOnTheFly', 'ShortifyPunit\ShortifyPunitWhenChainCase'];
 
     /**
      * Call static function is used to detect calls to protected & private methods
@@ -260,6 +260,69 @@ EOT;
         }
     }
 
+    private static function __create_chain_response($chainedMethodsBefore, $currentMethod, $action, $response, $args)
+    {
+        $rReturnValues = &self::$returnValues;
+        $currentMethodName = key($currentMethod);
+        $reachedMethod = false;
+
+        // Check return values chain
+        foreach ($chainedMethodsBefore as $chainedMethod)
+        {
+            $chainedMethodName = key($chainedMethod);
+            $chainedMethodArgs = $chainedMethod[$chainedMethodName];
+
+            if ($chainedMethodName == $currentMethodName) {
+                $reachedMethod = true;
+            }
+
+            if ($reachedMethod) {
+                continue;
+            }
+
+            $key = $chainedMethodName.serialize($chainedMethodArgs);
+
+            if ( ! array_key_exists($key, $rReturnValues)) {
+                return NULL;
+            }
+
+            $rReturnValues = &$rReturnValues[$key];
+        }
+
+        // Check current method exist in return values chain
+        $key = $currentMethodName.serialize($args);
+
+        if ( ! array_key_exists($key, $rReturnValues)) {
+            return NULL;
+        }
+
+        $response = $rReturnValues[$key];
+
+        if ( ! array_key_exists('response', $response)) {
+            throw self::generateException('Create chain response corrupt response return values');
+        }
+
+        $response = $response['response'];
+
+        if ( ! array_key_exists('action', $response) || ! array_key_exists('value', $response)) {
+            throw self::generateException('Create chain response corrupt response return values');
+        }
+
+        $action = $response['action'];
+        $value = $response['value'];
+
+
+        if ($action == MockAction::THROWS) {
+            throw is_object($value) ? $value : new $value;
+        }
+
+        return $value;
+    }
+
+    public static function whenChainStubbing($mock)
+    {
+        return new ShortifyPunitWhenChainCase($mock);
+    }
     /**
      * Setting up a mock response, function is called from mocked classes using `friend classes` style
      *
@@ -313,5 +376,16 @@ EOT;
         //if ($return['action'] == MockAction::RETURNS) {
         return $return['value'];
         //}
+    }
+
+    private static function addChainedResponse($response)
+    {
+        $firstChainedMethodName = key($response);
+
+        if (isset(self::$returnValues[$firstChainedMethodName])) {
+            self::$returnValues[$firstChainedMethodName] = array_replace_recursive(self::$returnValues[$firstChainedMethodName],$response[$firstChainedMethodName]);
+        } else {
+            self::$returnValues[$firstChainedMethodName] = $response[$firstChainedMethodName];
+        }
     }
 }
