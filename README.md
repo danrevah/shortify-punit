@@ -50,6 +50,11 @@ $mock->first_method();
 // returns 2
 $mock->first_method(1,2);
 
+// Stubbing callback
+$mockCallback = ShortifyPunit::mock('SimpleClassForMocking');
+ShortifyPunit::when($mockCallback)->first_method()->callback(function() { echo 'Foo Bar'; });
+$mock->first_method(); // prints 'Foo Bar'
+
 // Stubbing throws exception
 ShortifyPunit::when($mock)->second_method()->throws(new \Exception);
 
