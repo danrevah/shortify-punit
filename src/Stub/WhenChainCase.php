@@ -26,7 +26,7 @@ class WhenChainCase
     public function __call($method, $args)
     {
         // add to method list if not an action
-        if ( ! in_array($method, array(MockAction::RETURNS, MockAction::THROWS)))
+        if ( ! in_array($method, array(MockAction::RETURNS, MockAction::THROWS, MockAction::CALLBACK)))
         {
             array_unshift($this->methods, array($method => $args));
             return $this;

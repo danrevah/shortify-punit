@@ -2,6 +2,11 @@
 use ShortifyPunit\ShortifyPunit;
 use ShortifyPunit\Stub\WhenCase;
 
+class Foo
+{
+    function bar() {}
+}
+
 class ShortifyPunitWhenCaseTest extends \PHPUnit_Framework_TestCase
 {
 
@@ -23,6 +28,27 @@ class ShortifyPunitWhenCaseTest extends \PHPUnit_Framework_TestCase
         $mock = ShortifyPunit::mock('\Exception');
         $whenCase = new WhenCase(get_class($mock), $mock->mockInstanceId, 'abc');
         $whenCase->test();
+    }
+
+    /**
+     * @expectedException \PHPUnit_Framework_AssertionFailedError
+     */
+    public function testNoSuchAction()
+    {
+        $mock = ShortifyPunit::mock('Foo');
+        $whenCase = new WhenCase(get_class($mock), $mock->mockInstanceId);
+        $whenCase->bar(array())->foobar(array());
+    }
+
+
+    /**
+     * Testing when case add method
+     */
+    public function testWhenCaseAddMethod()
+    {
+        $mock = ShortifyPunit::mock('Foo');
+        $whenCase = new WhenCase(get_class($mock), $mock->mockInstanceId);
+        $whenCase->bar(array())->returns(array());
     }
 
 }

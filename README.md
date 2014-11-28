@@ -72,22 +72,22 @@ The `when` function is used to stubbing methods with specific parameters, using 
  // Creating a new mock for SimpleClassForMocking
  $mock = ShortifyPunit::mock('SimpleClassForMocking');
 
-  ShortifyPunit::when_chain($mock)->first_method()->second_method(2,3)->returns(1);
-  ShortifyPunit::when_chain($mock)->first_method()->second_method(2,3,4)->returns(2);
-  ShortifyPunit::when_chain($mock)->first_method(1)->second_method(2,3,4)->returns(3);
-  ShortifyPunit::when_chain($mock)->first_method(1,2,3)->second_method(1,2)->third_method()->returns(4);
+  ShortifyPunit::when($mock)->first_method()->second_method(2,3)->returns(1);
+  ShortifyPunit::when($mock)->first_method()->second_method(2,3,4)->returns(2);
+  ShortifyPunit::when($mock)->first_method(1)->second_method(2,3,4)->returns(3);
+  ShortifyPunit::when($mock)->first_method(1,2,3)->second_method(1,2)->third_method()->returns(4);
   
   $mock->first_method()->second_method(2,3); // returns 1
   $mock->first_method()->second_method(2,3,4); // returns 2
   $mock->first_method(1)->second_method(2,3,4); // returns 3
   $mock->first_method(1,2,3)->second_method(1,2)->third_method(); // return 4
 ```
-The `when_chain_methods` function is used chain methods for stubbing, using the same actions as the single function stubbing, return or throw.
+The `when` function is also used chain methods for stubbing, using the same actions as the single function stubbing `return` `throw` or `callback`.
 
 
 ## Argument Matcher
 
-ShortifyPunit allows the use of Hamcrest PHP (https://github.com/hamcrest/hamcrest-php) matchers on any argument. Hamcrest is a library of "matching functions" that, given a value, return true if that value
+ShortifyPunit allows the use of Hamcrest PHP (https://github.com/hamcrest/hamcrest-php) matcher on any argument. Hamcrest is a library of "matching functions" that, given a value, return true if that value
 matches some rule.
 
 ShortifyPunit matchers are included by default.

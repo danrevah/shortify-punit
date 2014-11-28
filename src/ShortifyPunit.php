@@ -197,26 +197,16 @@ EOT;
     /**
      * Setting up a when case
      *
-     * @param $class
+     * @param $mock
      * @return NULL|WhenCase
      */
-    public static function when($class)
+    public static function when($mock)
     {
-        if ($class instanceof MockInterface) {
-            return new WhenCase(get_class($class), $class->mockInstanceId);
+        if ($mock instanceof MockInterface) {
+            return new WhenChainCase($mock);
         }
 
         return NULL;
-    }
-
-    /**
-     * Used to stub chained methods
-     * @param $mock
-     * @return WhenChainCase
-     */
-    public static function when_chain($mock)
-    {
-        return new WhenChainCase($mock);
     }
 
     /**
