@@ -1,9 +1,0 @@
-tools:
-    external_code_coverage: true
-
-build:
-    dependencies:
-        before:
-            - curl -sS https://getcomposer.org/installer | php
-            - php composer.phar self-update
-            - php composer.phar install
