@@ -54,7 +54,7 @@ trait MockClass
 
                 // Changing the params into php function definition
                 $methodParams[] = $type . ($param->isPassedByReference() ? '&' : '') .
-                    '$' . $param->getName() . ($param->isOptional() ? '=' . var_export($paramDefaultValue, 1) : '');
+                    '$' . $param->getName() . ($param->isOptional() ? '=' . var_export($paramDefaultValue, true) : '');
             }
 
             $methodParams = implode(',', $methodParams);

@@ -67,13 +67,14 @@ class ShortifyPunit
         }
 
         $backTrace = debug_backtrace();
+        $callingClassName = $backTrace[2]['class'];
 
         $namespace = self::$namespace;
 
-        $reflection = new \ReflectionClass($backTrace[2]['class']);
+        $reflection = new \ReflectionClass($callingClassName);
 
         if ( ! $reflection->implementsInterface("{$namespace}\\Mock\\MockInterface") &&
-            isset($backTrace[2]['class']) && ! in_array($backTrace[2]['class'], self::$friendClasses))
+             ! in_array($callingClassName, self::$friendClasses))
         {
             throw self::generateException("{$class} is not a friend class!");
         }
@@ -250,19 +251,26 @@ class ShortifyPunit
     {
         $args = serialize($arguments);
 
-        if ( ! isset(self::$returnValues[$className][$methodName][$instanceId][$args]))
+        // check if instance of this method even exist
+        if ( ! isset(self::$returnValues[$className][$methodName][$instanceId])) {
+            return NULL;
+        }
+
+        // Check if exist as-is in return values array
+        if (isset(self::$returnValues[$className][$methodName][$instanceId][$args]))
         {
+            $return = self::$returnValues[$className][$methodName][$instanceId][$args];
 
-            if ( ! isset(self::$returnValues[$className][$methodName][$instanceId])) {
-                return NULL;
-            }
+            return self::createResponse($return, $arguments);
+        }
 
-            $returnValues = self::$returnValues[$className][$methodName][$instanceId];
-            $args = static::checkMatchingArguments($returnValues, $arguments);
 
-            if (is_null($args)) {
-                return NULL;
-            }
+        // try to finding matching Hamcrest-API Function (anything(), equalTo())
+        $returnValues = self::$returnValues[$className][$methodName][$instanceId];
+        $args = static::checkMatchingArguments($returnValues, $arguments);
+
+        if (is_null($args)) {
+            return NULL;
         }
 
         $return = self::$returnValues[$className][$methodName][$instanceId][$args];

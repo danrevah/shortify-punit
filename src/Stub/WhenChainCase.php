@@ -122,7 +122,6 @@ class WhenChainCase
      */
     private function extractChainedMethodsBefore($methods, $currentMethod)
     {
-        $reachedMethod = false;
         $chainedMethodsBefore = [];
         $currentMethodName = key($currentMethod);
 
@@ -131,11 +130,7 @@ class WhenChainCase
             $methodName = key($method);
 
             if ($methodName == $currentMethodName) {
-                $reachedMethod = true;
-            }
-
-            if ($reachedMethod) {
-                continue;
+                return $chainedMethodsBefore;
             }
 
             $chainedMethodsBefore[] = $method;

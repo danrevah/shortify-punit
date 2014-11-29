@@ -43,31 +43,27 @@ class WhenCase
         // set method if hasn't been set yet
         if (empty($this->method))
         {
-            if (method_exists($this->className, $method)) {
-                $this->method = $method;
-                $this->args = $args;
-            }
-            else {
+            if ( ! method_exists($this->className, $method)) {
                 throw static::generateException("`{$method}` method doesn't exist in {$this->className} !");
             }
+
+            $this->method = $method;
+            $this->args = $args;
+            return $this;
         }
-        else
-        {
-            if ( ! isset($args[0])) {
-                throw static::generateException("Invalid call to ShortifyPunitWhenCase!");
-            }
 
-            $value = $args[0];
-
-
-            // set return / throw method
-            if (in_array($method, array(MockAction::CALLBACK, MockAction::RETURNS, MockAction::CALLBACK))) {
-                $this->setMethod($this->args, $method, $value);
-            }
-            else {
-                throw static::generateException("`{$method}` no such action!");
-            }
+        if (count($args) != 1) {
+            throw static::generateException("Invalid call to ShortifyPunitWhenCase!");
         }
+
+        $value = array_pop($args);
+
+        // set return / throw method
+        if ( ! in_array($method, array(MockAction::CALLBACK, MockAction::RETURNS, MockAction::CALLBACK))) {
+            throw static::generateException("`{$method}` no such action!");
+        }
+
+        $this->setMethod($this->args, $method, $value);
 
         return $this;
     }
