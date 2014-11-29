@@ -144,7 +144,7 @@ class ShortifyPunit
      * @param $args
      * @return null
      */
-    public static function _create_chain_response($chainedMethodsBefore, $currentMethod, $args)
+    protected static function _create_chain_response($chainedMethodsBefore, $currentMethod, $args)
     {
         $rReturnValues = &self::$returnValues;
         $currentMethodName = key($currentMethod);
@@ -192,12 +192,7 @@ class ShortifyPunit
      */
     private static function createResponse($response, $arguments)
     {
-        if ( ! array_key_exists('action', $response) || ! array_key_exists('value', $response)) {
-            throw self::generateException('Create chain response corrupt response return values');
-        }
-
-        $action = $response['action'];
-        $value = $response['value'];
+        list($action, $value) = self::extractResponseValues($response);
 
 
         if ($action == MockAction::THROWS) {
@@ -220,7 +215,7 @@ class ShortifyPunit
      * @param $action
      * @param $returns
      */
-    private static function setWhenMockResponse($className, $instanceId, $methodName, $args, $action, $returns)
+    protected static function setWhenMockResponse($className, $instanceId, $methodName, $args, $action, $returns)
     {
         $args = serialize($args);
 
@@ -231,7 +226,7 @@ class ShortifyPunit
      * Generating instance id, function is called from mocked classes using `friend classes` style
      * @return int
      */
-    private static function generateInstanceId()
+    protected static function generateInstanceId()
     {
         return ++self::$instanceId;
     }
@@ -247,7 +242,7 @@ class ShortifyPunit
      * @internal param $args
      * @return Mixed | null
      */
-    public static function _create_response($className, $instanceId, $methodName, $arguments)
+    protected static function _create_response($className, $instanceId, $methodName, $arguments)
     {
         $args = serialize($arguments);
 
@@ -283,7 +278,7 @@ class ShortifyPunit
      *
      * @param $response
      */
-    private static function addChainedResponse($response)
+    protected static function addChainedResponse($response)
     {
         $firstChainedMethodName = key($response);
 
@@ -292,5 +287,20 @@ class ShortifyPunit
         } else {
             self::$returnValues[$firstChainedMethodName] = $response[$firstChainedMethodName];
         }
+    }
+
+    /**
+     * @param $response
+     * @return array
+     */
+    private static function extractResponseValues($response)
+    {
+        if (!array_key_exists('action', $response) || !array_key_exists('value', $response)) {
+            throw self::generateException('Create chain response corrupt response return values');
+        }
+
+        $action = $response['action'];
+        $value = $response['value'];
+        return array($action, $value);
     }
 }
