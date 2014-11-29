@@ -120,6 +120,10 @@ class MockClass
         /* Mocking methods */
         foreach ($methods as $method)
         {
+            if ( ! $method instanceof \ReflectionMethod) {
+                continue;
+            }
+
             // Ignoring final & private methods
             if ($method->isFinal() || $method->isPrivate()) {
                 continue;
@@ -133,33 +137,7 @@ class MockClass
             $methodName = $method->getName();
             $returnsByReference = $method->returnsReference() ? '&' : '';
 
-            $methodParams = [];
-
-            // Get method parameters
-            foreach ($method->getParameters() as $param)
-            {
-                // Get type hinting
-                if ($param->isArray()) {
-                    $type = 'array ';
-                } else if ($param->getClass()) {
-                    $type = '\\' . $param->getClass()->getName();
-                } else {
-                    $type = '';
-                }
-
-                // Get default value if exists
-                try {
-                    $paramDefaultValue = $param->getDefaultValue();
-                } catch (\ReflectionException $e) {
-                    $paramDefaultValue = NULL;
-                }
-
-                // Changing the params into php function definition
-                $methodParams[] = $type . ($param->isPassedByReference() ? '&' : '') .
-                    '$' . $param->getName() . ($param->isOptional() ? '=' . var_export($paramDefaultValue, true) : '');
-            }
-
-            $methodParams = implode(',', $methodParams);
+            $methodParams = self::extractMethodParameters($method);
 
 
             $class .= <<<EOT
@@ -293,6 +271,41 @@ EOT;
         $action = $response['action'];
         $value = $response['value'];
         return array($action, $value);
+    }
+
+    /**
+     * @param \ReflectionMethod $method
+     * @return array|string
+     */
+    protected static function extractMethodParameters(\ReflectionMethod $method)
+    {
+        $methodParams = [];
+
+        // Get method parameters
+        foreach ($method->getParameters() as $param) {
+            // Get type hinting
+            if ($param->isArray()) {
+                $type = 'array ';
+            } else if ($param->getClass()) {
+                $type = '\\' . $param->getClass()->getName();
+            } else {
+                $type = '';
+            }
+
+            // Get default value if exists
+            try {
+                $paramDefaultValue = $param->getDefaultValue();
+            } catch (\ReflectionException $e) {
+                $paramDefaultValue = NULL;
+            }
+
+            // Changing the params into php function definition
+            $methodParams[] = $type . ($param->isPassedByReference() ? '&' : '') .
+                '$' . $param->getName() . ($param->isOptional() ? '=' . var_export($paramDefaultValue, true) : '');
+        }
+
+        $methodParams = implode(',', $methodParams);
+        return $methodParams;
     }
 
 } 
