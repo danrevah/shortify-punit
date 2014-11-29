@@ -2,7 +2,6 @@
 namespace ShortifyPunit\Stub;
 use ShortifyPunit\Enums\MockAction;
 use ShortifyPunit\Exceptions\ExceptionFactory;
-use ShortifyPunit\Mock\MockClass;
 use ShortifyPunit\ShortifyPunit;
 
 /**
@@ -11,7 +10,7 @@ use ShortifyPunit\ShortifyPunit;
  * @desc When Case, is used to set up mocking response using specific call arguments
  *       and return action (throw exception, return value, ..)
  */
-class WhenCase extends MockClass
+class WhenCase
 {
     use ExceptionFactory;
 
@@ -36,7 +35,7 @@ class WhenCase extends MockClass
      */
     public function setMethod($args, $action, $returns)
     {
-        static::setWhenMockResponse($this->className, $this->instanceId, $this->method, $args, $action, $returns);
+        ShortifyPunit::setWhenMockResponse($this->className, $this->instanceId, $this->method, $args, $action, $returns);
     }
 
     public function __call($method, $args)

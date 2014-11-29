@@ -1,6 +1,5 @@
 <?php
 namespace ShortifyPunit\Stub;
-use ShortifyPunit\Mock\MockClass;
 use ShortifyPunit\Mock\MockClassOnTheFly;
 use ShortifyPunit\Enums\MockAction;
 use ShortifyPunit\Exceptions\ExceptionFactory;
@@ -12,7 +11,7 @@ use ShortifyPunit\ShortifyPunit;
  * @desc When Case, is used to set up mocking response using specific call arguments
  *       and return action (throw exception, return value, ..)
  */
-class WhenChainCase extends MockClass
+class WhenChainCase
 {
     use ExceptionFactory;
 
@@ -71,7 +70,7 @@ class WhenChainCase extends MockClass
 
             // closure for MockOnTheFly chained methods
             $fakeClass->$currentMethodName = function() use ($chainedMethodsBefore, $currentMethod) {
-                return static::_create_chain_response($chainedMethodsBefore, $currentMethod, func_get_args());
+                return ShortifyPunit::_create_chain_response($chainedMethodsBefore, $currentMethod, func_get_args());
             };
 
             $lastValue = $fakeClass;
@@ -111,7 +110,7 @@ class WhenChainCase extends MockClass
 
         $rResponse[$currentMethodName][serialize(current($currentMethod))] = ['response' => ['action' => $action, 'value' => $lastValue]];
 
-        static::addChainedResponse($response);
+        ShortifyPunit::addChainedResponse($response);
     }
 
     /**
