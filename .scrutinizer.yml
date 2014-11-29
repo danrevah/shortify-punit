@@ -1,2 +1,8 @@
 tools:
     external_code_coverage: true
+
+build:
+    dependencies:
+        before:
+            - composer self-update
+            - composer install
