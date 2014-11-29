@@ -73,6 +73,7 @@ EOT;
 
     /**
      * @param $namespaceDeclaration
+     * @param $mockedNamespace
      * @param $mockedObjectName
      * @param $extends
      * @param $className
@@ -80,10 +81,21 @@ EOT;
      * @param $namespace
      * @param $basename
      * @param $methods
-     * @return string
+     * @return mixed
      */
-    protected static function mockClass($namespaceDeclaration, $mockedObjectName, $extends, $className, $marker, $namespace, $basename, $methods)
+    protected static function mockClass($namespaceDeclaration, $mockedNamespace, $mockedObjectName, $extends, $className, $marker, $namespace, $basename, $methods)
     {
+        if ($mockedNamespace) {
+            $namespaceDeclaration = "namespace $mockedNamespace;";
+        }
+
+        $mockerClass = "{$mockedNamespace}\\{$mockedObjectName}";
+
+        // Prevent duplicate mocking, return new instance of the mocked class
+        if (class_exists($mockerClass, FALSE)) {
+            return new $mockerClass();
+        }
+
         $class = <<<EOT
   $namespaceDeclaration
   class $mockedObjectName $extends $className $marker {
@@ -96,7 +108,10 @@ EOT;
 EOT;
         $class = self::mockClassMethods($methods, $namespace, $basename, $mockedObjectName, $class);
         $class .= '}';
-        return $class;
+
+        eval($class);
+
+        return new $mockedObjectName();
     }
 
 } 

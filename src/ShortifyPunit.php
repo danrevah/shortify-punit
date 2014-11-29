@@ -110,27 +110,17 @@ class ShortifyPunit
         $className = $reflection->getName();
         $methods = $reflection->getMethods();
 
+        $namespaceDeclaration = '';
+
         if ($reflection->isInterface()) {
             $extends = 'implements';
             $marker = ", {$namespace}\\Mock\\MockInterface" ;
-        }
-        else {
+        } else {
             $extends = 'extends';
             $marker = "implements {$namespace}\\Mock\\MockInterface";
         }
 
-        $namespaceDeclaration = $mockedNamespace ? "namespace $mockedNamespace;" : '';
-        $mockerClass = "{$mockedNamespace}\\{$mockedObjectName}";
-
-        // Prevent duplicate mocking, return new instance of the mocked class
-        if (class_exists($mockerClass, FALSE)) {
-            return new $mockerClass();
-        }
-
-        $class = static::mockClass($namespaceDeclaration, $mockedObjectName, $extends, $className, $marker, $namespace, $basename, $methods);
-        eval($class);
-
-        return new $mockedObjectName();
+        return static::mockClass($namespaceDeclaration, $mockedNamespace, $mockedObjectName, $extends, $className, $marker, $namespace, $basename, $methods);
     }
 
     /**
