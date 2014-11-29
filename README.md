@@ -1,4 +1,4 @@
-#ShortifyPunit &nbsp; [![Build Status](https://travis-ci.org/danrevah/ShortifyPunit.svg?branch=master)](https://travis-ci.org/danrevah/ShortifyPunit)   &nbsp; [![Coverage Status](https://coveralls.io/repos/danrevah/ShortifyPunit/badge.png?branch=master)](https://coveralls.io/repos/danrevah/ShortifyPunit/badge.png?branch=master)  &nbsp; ![Code Quality](https://scrutinizer-ci.com/g/danrevah/ShortifyPunit/badges/quality-score.png?b=master)
+#ShortifyPunit &nbsp; [![Build Status](https://travis-ci.org/danrevah/ShortifyPunit.svg?branch=master)](https://travis-ci.org/danrevah/ShortifyPunit)  [![Coverage Status](https://coveralls.io/repos/danrevah/ShortifyPunit/badge.png?branch=master)](https://coveralls.io/repos/danrevah/ShortifyPunit/badge.png?branch=master) ![Code Quality](https://scrutinizer-ci.com/g/danrevah/ShortifyPunit/badges/quality-score.png?b=master)
 > PHP Simple mocking library, **v0.1.3**
 
  * [Installation](#installation)
