@@ -101,26 +101,7 @@ class ShortifyPunit
             throw self::generateException("Unable to mock class {$mockedClass} declared as final");
         }
 
-        $basename = self::$classBasePrefix;
-        $namespace = self::$namespace;
-
-        $mockedNamespace = $reflection->getNamespaceName();
-        $mockedObjectName = $reflection->getShortName().'Mock';
-
-        $className = $reflection->getName();
-        $methods = $reflection->getMethods();
-
-        $namespaceDeclaration = '';
-
-        if ($reflection->isInterface()) {
-            $extends = 'implements';
-            $marker = ", {$namespace}\\Mock\\MockInterface" ;
-        } else {
-            $extends = 'extends';
-            $marker = "implements {$namespace}\\Mock\\MockInterface";
-        }
-
-        return static::mockClass($namespaceDeclaration, $mockedNamespace, $mockedObjectName, $extends, $className, $marker, $namespace, $basename, $methods);
+        return static::mockClass($reflection, self::$namespace, self::$classBasePrefix);
     }
 
     /**

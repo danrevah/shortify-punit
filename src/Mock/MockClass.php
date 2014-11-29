@@ -72,19 +72,28 @@ EOT;
 
 
     /**
-     * @param $namespaceDeclaration
-     * @param $mockedNamespace
-     * @param $mockedObjectName
-     * @param $extends
-     * @param $className
-     * @param $marker
+     * @param \ReflectionClass $reflection
      * @param $namespace
      * @param $basename
-     * @param $methods
      * @return mixed
      */
-    protected static function mockClass($namespaceDeclaration, $mockedNamespace, $mockedObjectName, $extends, $className, $marker, $namespace, $basename, $methods)
+    protected static function mockClass(\ReflectionClass $reflection, $namespace, $basename)
     {
+        $mockedNamespace = $reflection->getNamespaceName();
+        $mockedObjectName = $reflection->getShortName().'Mock';
+
+        $className = $reflection->getName();
+        $methods = $reflection->getMethods();
+        $namespaceDeclaration = '';
+
+        if ($reflection->isInterface()) {
+            $extends = 'implements';
+            $marker = ", {$namespace}\\Mock\\MockInterface" ;
+        } else {
+            $extends = 'extends';
+            $marker = "implements {$namespace}\\Mock\\MockInterface";
+        }
+
         if ($mockedNamespace) {
             $namespaceDeclaration = "namespace $mockedNamespace;";
         }
