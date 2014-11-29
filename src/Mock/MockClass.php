@@ -83,7 +83,6 @@ EOT;
 
         $className = $reflection->getName();
         $methods = $reflection->getMethods();
-        $namespaceDeclaration = '';
 
         if ($reflection->isInterface()) {
             $extends = 'implements';
