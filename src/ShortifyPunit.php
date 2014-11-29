@@ -144,7 +144,7 @@ class ShortifyPunit
      * @param $args
      * @return null
      */
-    private static function __create_chain_response($chainedMethodsBefore, $currentMethod, $args)
+    public static function _create_chain_response($chainedMethodsBefore, $currentMethod, $args)
     {
         $rReturnValues = &self::$returnValues;
         $currentMethodName = key($currentMethod);
@@ -247,7 +247,7 @@ class ShortifyPunit
      * @internal param $args
      * @return Mixed | null
      */
-    private static function __create_response($className, $instanceId, $methodName, $arguments)
+    public static function _create_response($className, $instanceId, $methodName, $arguments)
     {
         $args = serialize($arguments);
 

@@ -62,7 +62,7 @@ trait MockClass
 
             $class .= <<<EOT
     public function $returnsByReference $methodName ({$methodParams}) {
-        return {$namespace}\\{$basename}::__create_response('{$mockedObjectName}', \$this->mockInstanceId, '{$methodName}', func_get_args());
+        return {$namespace}\\{$basename}::_create_response('{$mockedObjectName}', \$this->mockInstanceId, '{$methodName}', func_get_args());
     }
 EOT;
 

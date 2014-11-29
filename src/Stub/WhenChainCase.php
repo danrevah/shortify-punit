@@ -70,7 +70,7 @@ class WhenChainCase
 
             // closure for MockOnTheFly chained methods
             $fakeClass->$currentMethodName = function() use ($chainedMethodsBefore, $currentMethod) {
-                return ShortifyPunit::__create_chain_response($chainedMethodsBefore, $currentMethod, func_get_args());
+                return ShortifyPunit::_create_chain_response($chainedMethodsBefore, $currentMethod, func_get_args());
             };
 
             $lastValue = $fakeClass;
