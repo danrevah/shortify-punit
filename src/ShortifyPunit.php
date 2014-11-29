@@ -107,16 +107,16 @@ class ShortifyPunit
     /**
      * Setting up a when case
      *
-     * @param $mock
-     * @return NULL|WhenCase
+     * @param MockInterface $mock
+     * @return WhenChainCase
      */
     public static function when($mock)
     {
-        if ($mock instanceof MockInterface) {
-            return new WhenChainCase($mock);
+        if ( ! $mock instanceof MockInterface) {
+            throw self::generateException('when() must get a mocked instance as parameter');
         }
 
-        return NULL;
+        return new WhenChainCase($mock);
     }
 
     /**

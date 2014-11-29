@@ -79,7 +79,6 @@ EOT;
      */
     protected static function mockClass(\ReflectionClass $reflection, $namespace, $basename)
     {
-        $mockedNamespace = $reflection->getNamespaceName();
         $mockedObjectName = $reflection->getShortName().'Mock';
 
         $className = $reflection->getName();
@@ -94,9 +93,8 @@ EOT;
             $marker = "implements {$namespace}\\Mock\\MockInterface";
         }
 
-        if ($mockedNamespace) {
-            $namespaceDeclaration = "namespace $mockedNamespace;";
-        }
+        $mockedNamespace = $reflection->getNamespaceName();
+        $namespaceDeclaration = $mockedNamespace ? "namespace $mockedNamespace;" : '';
 
         $mockerClass = "{$mockedNamespace}\\{$mockedObjectName}";
 

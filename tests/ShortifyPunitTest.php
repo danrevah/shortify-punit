@@ -34,6 +34,10 @@ class SimpleClassForMocking
  */
 final class FinalClassForMocking
 {
+}
+
+interface InterfaceTest
+{
 
 }
 
@@ -119,12 +123,21 @@ class ShortifyPunitTest extends \PHPUnit_Framework_TestCase
     }
     /**
      * @checks when which is not instance of Mock
+     * @expectedException \PHPUnit_Framework_AssertionFailedError
      */
     public function testWhenNotInstanceOf()
     {
         $someClass = new SimpleClassForMocking();
-        $when = ShortifyPunit::when($someClass);
-        $this->assertNull($when);
+        ShortifyPunit::when($someClass)->returns(1);
+    }
+
+    /**
+     * @checks Asserting interface mock
+     */
+    public function testMockInstance()
+    {
+        $mock = ShortifyPunit::mock('InterfaceTest');
+        $this->assertInstanceOf('InterfaceTest', $mock);
     }
 
     /**
