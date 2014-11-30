@@ -46,7 +46,7 @@ echo $mock->first_method(1,2); // prints '2'
 
 // Stubbing callback
 ShortifyPunit::when($mock)->first_method()->callback(function() { echo 'Foo Bar'; });
-$mock->first_method(); // prints 'Foo Bar'
+echo $mock->first_method(); // prints 'Foo Bar'
 
 // Stubbing throws exception
 ShortifyPunit::when($mock)->second_method()->throws(new Exception());
@@ -64,10 +64,10 @@ The `when` function is used to stubbing methods with specific parameters, using 
   ShortifyPunit::when($mock)->first_method(1)->second_method(1)->returns(3);
   ShortifyPunit::when($mock)->first_method(2)->second_method(2)->third_method()->returns(4);
   
-  $mock->first_method()->second_method(1); // returns 1
-  $mock->first_method()->second_method(2); // returns 2
-  $mock->first_method(1)->second_method(1); // returns 3
-  $mock->first_method(2)->second_method(2)->third_method(); // return 4
+  echo $mock->first_method()->second_method(1); // prints '1'
+  echo $mock->first_method()->second_method(2); // prints '2'
+  echo $mock->first_method(1)->second_method(1); // prints '3'
+  echo $mock->first_method(2)->second_method(2)->third_method(); // prints '4'
 ```
 `when` function is also used chain methods for stubbing, using the same actions as the single function stubbing `return` `throw` or `callback`.
 
