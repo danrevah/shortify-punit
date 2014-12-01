@@ -2,6 +2,7 @@
 namespace ShortifyPunit;
 
 use Hamcrest\AssertionError;
+use ShortifyPunit\Enums\MockTypes;
 use ShortifyPunit\Mock\MockInterface;
 use ShortifyPunit\Enums\MockAction;
 use ShortifyPunit\Exceptions\ExceptionFactory;
@@ -101,6 +102,30 @@ class ShortifyPunit
         }
 
         return static::mockClass($reflection, self::$namespace, self::$classBasePrefix);
+    }
+
+    /**
+     * Partial Mocking interfaces|classes
+     * - Ignoring final and private methods.
+     *
+     * Partial mock is not stubbing any function in default (to NULL) like in regular mock()
+     *
+     * @param $mockedClass
+     * @return mixed
+     */
+    public static function spy($mockedClass)
+    {
+        if ( ! class_exists($mockedClass) and ! interface_exists($mockedClass)) {
+            throw self::generateException("Mocking failed `{$mockedClass}` No such class or interface");
+        }
+
+        $reflection = new \ReflectionClass($mockedClass);
+
+        if ($reflection->isFinal()) {
+            throw self::generateException("Unable to mock class {$mockedClass} declared as final");
+        }
+
+        return static::mockClass($reflection, self::$namespace, self::$classBasePrefix, MockTypes::PARTIAL);
     }
 
     /**
