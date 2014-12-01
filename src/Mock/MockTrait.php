@@ -100,7 +100,7 @@ EOT;
      */
     protected static function mockClass(\ReflectionClass $reflection, $namespace, $basename, $mockType = MockTypes::FULL)
     {
-        $mockedObjectName = $reflection->getShortName().'Mock';
+        $mockedObjectName = $reflection->getShortName().(MockTypes::PARTIAL ? 'PARTIAL' : 'MOCK');
 
         $className = $reflection->getName();
         $methods = $reflection->getMethods();
