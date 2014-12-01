@@ -1,19 +1,20 @@
 <?php
 namespace ShortifyPunit\Mock;
 
+use ShortifyPunit\Enums\MockTypes;
 
 trait MockTrait
 {
-
     /**
      * @param $methods
      * @param $namespace
      * @param $basename
      * @param $mockedObjectName
      * @param $class
+     * @param $mockType
      * @return string
      */
-    protected static function mockClassMethods($methods, $namespace, $basename, $mockedObjectName, $class)
+    protected static function mockClassMethods($methods, $namespace, $basename, $mockedObjectName, $class, $mockType)
     {
         /* Mocking methods */
         foreach ($methods as $method)
@@ -61,11 +62,29 @@ trait MockTrait
             $methodParams = implode(',', $methodParams);
 
 
-            $class .= <<<EOT
-    public function $returnsByReference $methodName ({$methodParams}) {
-        return {$namespace}\\{$basename}::_create_response('{$mockedObjectName}', \$this->mockInstanceId, '{$methodName}', func_get_args());
-    }
+            if ($mockType == MockTypes::PARTIAL)
+            {
+                $class .= <<<EOT
+                public function $returnsByReference $methodName ({$methodParams}) {
+                    \$args = func_get_args();
+                    \$methodStubbed = {$namespace}\\{$basename}::_is_method_stubbed('{$mockedObjectName}', \$this->mockInstanceId, '{$methodName}', \$args);
+
+                    if (\$methodStubbed) {
+                        return {$namespace}\\{$basename}::_create_response('{$mockedObjectName}', \$this->mockInstanceId, '{$methodName}', \$args);
+                    } else {
+                        return call_user_func_array(array('parent', __FUNCTION__), \$args);
+                    }
+                }
 EOT;
+            }
+            else
+            {
+                $class .= <<<EOT
+                public function $returnsByReference $methodName ({$methodParams}) {
+                    return {$namespace}\\{$basename}::_create_response('{$mockedObjectName}', \$this->mockInstanceId, '{$methodName}', func_get_args());
+                }
+EOT;
+            }
 
         }
         return $class;
@@ -76,9 +95,10 @@ EOT;
      * @param \ReflectionClass $reflection
      * @param $namespace
      * @param $basename
+     * @param string $mockType
      * @return mixed
      */
-    protected static function mockClass(\ReflectionClass $reflection, $namespace, $basename)
+    protected static function mockClass(\ReflectionClass $reflection, $namespace, $basename, $mockType = MockTypes::FULL)
     {
         $mockedObjectName = $reflection->getShortName().'Mock';
 
@@ -113,7 +133,7 @@ EOT;
    }
 
 EOT;
-        $class = self::mockClassMethods($methods, $namespace, $basename, $mockedObjectName, $class);
+        $class = self::mockClassMethods($methods, $namespace, $basename, $mockedObjectName, $class, $mockType);
         $class .= '}';
 
         eval($class);
