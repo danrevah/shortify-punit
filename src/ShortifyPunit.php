@@ -90,16 +90,7 @@ class ShortifyPunit
      */
     public static function mock($mockedClass)
     {
-
-        if ( ! class_exists($mockedClass) and ! interface_exists($mockedClass)) {
-            throw self::generateException("Mocking failed `{$mockedClass}` No such class or interface");
-        }
-
-        $reflection = new \ReflectionClass($mockedClass);
-
-        if ($reflection->isFinal()) {
-            throw self::generateException("Unable to mock class {$mockedClass} declared as final");
-        }
+        $reflection = self::getMockReflection($mockedClass);
 
         return static::mockClass($reflection, self::$namespace, self::$classBasePrefix);
     }
@@ -115,15 +106,7 @@ class ShortifyPunit
      */
     public static function spy($mockedClass)
     {
-        if ( ! class_exists($mockedClass) and ! interface_exists($mockedClass)) {
-            throw self::generateException("Mocking failed `{$mockedClass}` No such class or interface");
-        }
-
-        $reflection = new \ReflectionClass($mockedClass);
-
-        if ($reflection->isFinal()) {
-            throw self::generateException("Unable to mock class {$mockedClass} declared as final");
-        }
+        $reflection = self::getMockReflection($mockedClass);
 
         return static::mockClass($reflection, self::$namespace, self::$classBasePrefix, MockTypes::PARTIAL);
     }
@@ -325,5 +308,23 @@ class ShortifyPunit
         $action = $response['action'];
         $value = $response['value'];
         return array($action, $value);
+    }
+
+    /**
+     * @param $mockedClass
+     * @return \ReflectionClass
+     */
+    private static function getMockReflection($mockedClass)
+    {
+        if (!class_exists($mockedClass) and !interface_exists($mockedClass)) {
+            throw self::generateException("Mocking failed `{$mockedClass}` No such class or interface");
+        }
+
+        $reflection = new \ReflectionClass($mockedClass);
+
+        if ($reflection->isFinal()) {
+            throw self::generateException("Unable to mock class {$mockedClass} declared as final");
+        }
+        return $reflection;
     }
 }
