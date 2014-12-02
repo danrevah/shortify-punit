@@ -57,6 +57,8 @@ The `when` function is used to stubbing methods with specific parameters, using 
 
 ## Spies
 
+Spies are a partial mock, sometimes you need the method to behave normally except for the one method that you need to test. That so called partial mocking can be done using ShortifyPunit spy method
+
 ```php
 class Foo {
   function bar() { return 'bar'; }
@@ -71,9 +73,6 @@ echo $spy->bar(); // prints 'bar'
 ShortifyPunit::when($spy)->bar()->returns('foo'); // stubbing spy
 echo $spy->bar(); // prints 'foo'
 ```
-
-Spies are a partial mock, sometimes you need the method to behave normally except for the one method that you need to test. That so called partial mocking can be done using ShortifyPunit spy method
-
 
 ## Stubbing Method Chanining
 ```php
