@@ -239,7 +239,6 @@ class ShortifyPunitTest extends \PHPUnit_Framework_TestCase
         $mock->first_method()->second_method(2,3);
     }
 
-
     /**
      * @expectedException PHPUnit_Framework_AssertionFailedError
      */

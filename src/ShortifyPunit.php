@@ -12,7 +12,7 @@ use ShortifyPunit\Stub\WhenChainCase;
 
 class ShortifyPunit
 {
-    use ArgumentMatcher, ExceptionFactory, MockTrait;
+    use ArgumentMatcher, MockTrait;
 
     /**
      * @var int - Last mock instance id (Counter)
@@ -206,27 +206,7 @@ class ShortifyPunit
         return self::createResponse($response, $args);
     }
 
-    /**
-     * Creating response by response options (Return/Throw/Callback)
-     *
-     * @param $response
-     * @param $arguments
-     * @return mixed
-     */
-    private static function createResponse($response, $arguments)
-    {
-        list($action, $value) = self::extractResponseValues($response);
 
-
-        if ($action == MockAction::THROWS) {
-            throw is_object($value) ? $value : new $value;
-        }
-        else if ($action == MockAction::CALLBACK) {
-            return call_user_func_array($value, $arguments);
-        }
-
-        return $value;
-    }
 
     /**
      * Setting up a mock response, function is called from mocked classes using `friend classes` style
@@ -310,21 +290,6 @@ class ShortifyPunit
         } else {
             self::$returnValues[$firstChainedMethodName] = $response[$firstChainedMethodName];
         }
-    }
-
-    /**
-     * @param $response
-     * @return array
-     */
-    private static function extractResponseValues($response)
-    {
-        if (!array_key_exists('action', $response) || !array_key_exists('value', $response)) {
-            throw self::generateException('Create chain response corrupt response return values');
-        }
-
-        $action = $response['action'];
-        $value = $response['value'];
-        return array($action, $value);
     }
 
     /**

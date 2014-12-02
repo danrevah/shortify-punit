@@ -130,7 +130,7 @@ class WhenChainCase
             $methodName = key($method);
 
             if ($methodName == $currentMethodName) {
-                return $chainedMethodsBefore;
+                break;
             }
 
             $chainedMethodsBefore[] = $method;

@@ -1,10 +1,13 @@
 <?php
 namespace ShortifyPunit\Mock;
 
+use ShortifyPunit\Enums\MockAction;
 use ShortifyPunit\Enums\MockTypes;
+use ShortifyPunit\Exceptions\ExceptionFactory;
 
 trait MockTrait
 {
+    use ExceptionFactory;
     /**
      * @param $methods
      * @param $namespace
@@ -139,6 +142,43 @@ EOT;
         eval($class);
 
         return new $mockedObjectName();
+    }
+
+    /**
+     * Creating response by response options (Return/Throw/Callback)
+     *
+     * @param $response
+     * @param $arguments
+     * @return mixed
+     */
+    protected static function createResponse($response, $arguments)
+    {
+        list($action, $value) = self::extractResponseValues($response);
+
+
+        if ($action == MockAction::THROWS) {
+            throw is_object($value) ? $value : new $value;
+        }
+        else if ($action == MockAction::CALLBACK) {
+            return call_user_func_array($value, $arguments);
+        }
+
+        return $value;
+    }
+
+    /**
+     * @param $response
+     * @return array
+     */
+    private static function extractResponseValues($response)
+    {
+        if (!array_key_exists('action', $response) || !array_key_exists('value', $response)) {
+            throw self::generateException('Create chain response corrupt response return values');
+        }
+
+        $action = $response['action'];
+        $value = $response['value'];
+        return array($action, $value);
     }
 
 } 
