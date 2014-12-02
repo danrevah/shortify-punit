@@ -104,12 +104,11 @@ Examples:
 ```php
 class Foo
 {
-	public function Bar($arg){
-	}
+  function bar($arg){}
 }
 
 $stub = ShortifyPunit::mock('Foo');
-ShortifyPunit::when($stub)->Bar(anything())->return('FooBar');
+ShortifyPunit::when($stub)->bar(anything())->return('FooBar');
 ```
 
 Some common Hamcrest matchers:
