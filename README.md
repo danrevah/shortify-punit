@@ -89,7 +89,7 @@ echo $spy->bar(); // prints 'foo'
   echo $mock->first_method(1)->second_method(1); // prints '3'
   echo $mock->first_method(2)->second_method(2)->third_method(); // prints '4'
 ```
-`when` function is also used chain methods for stubbing, using the same actions as the single function stubbing `return` `throw` or `callback`.
+`when` function is also used to stub chained methods, using the same actions as the single function stubbing `return` `throw` or `callback`.
 
 
 ## Argument Matcher
