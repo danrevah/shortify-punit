@@ -97,7 +97,7 @@ echo $spy->bar(); // prints 'foo'
 ShortifyPunit allows the use of Hamcrest PHP (https://github.com/hamcrest/hamcrest-php) matcher on any argument. Hamcrest is a library of "matching functions" that, given a value, return true if that value
 matches some rule.
 
-ShortifyPunit matchers are included by default.
+Hamcrest matchers are included by default.
 
 Examples:
 
