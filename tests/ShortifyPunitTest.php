@@ -1,6 +1,7 @@
 <?php
 use ShortifyPunit\Enums\MockAction;
 use ShortifyPunit\ShortifyPunit;
+use ShortifyPunit\Mock\MockInterface;
 
 /**
  * Class SimpleClassForMocking
@@ -318,5 +319,32 @@ class ShortifyPunitTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($mock->first_method(3)->second_method('foo bar', new Exception()));
 
         $this->assertEquals($mock->first_method(4)->second_method(1), 5);
+    }
+
+    /**
+     * Testing spies
+     */
+    public function testSpies()
+    {
+        $spy = ShortifyPunit::spy('SimpleClassForMocking');
+
+        $this->assertEquals($spy->first_method(), 1); // default value
+        $this->assertEquals($spy->second_method(), 2); // default value
+        $this->assertEquals($spy->third_method(), 3); // default value
+
+        // after stubbing
+        ShortifyPunit::when($spy)->first_method()->returns('foo');
+        $this->assertEquals($spy->first_method(), 'foo');
+
+        // still default value
+        $this->assertEquals($spy->second_method(), 2); // default value
+        $this->assertEquals($spy->third_method(), 3); // default value
+
+        // test chain stubbing
+        ShortifyPunit::when($spy)->second_method()->third_method()->returns('bar');
+        $this->assertEquals($spy->second_method()->third_method(), 'bar');
+
+        // after chaning methods in chain with same arguments are instanceof `MockClassOnTheFly`
+        $this->assertInstanceOf('ShortifyPunit\Mock\MockClassOnTheFly', $spy->second_method());
     }
 }

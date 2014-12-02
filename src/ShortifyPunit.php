@@ -143,6 +143,23 @@ class ShortifyPunit
     }
 
     /**
+     * Checking if a method with specific arguments has been stubbed
+     *
+     * @param $className
+     * @param $instanceId
+     * @param $methodName
+     * @return bool
+     */
+    protected static function _is_method_stubbed($className, $instanceId, $methodName)
+    {
+        // check if instance of this method even exist
+        if ( ! isset(self::$returnValues[$className][$methodName][$instanceId])) {
+            return FALSE;
+        }
+
+        return TRUE;
+    }
+    /**
      * Setting up a chained mock response, function is called from mocked classes using `friend classes` style
      *
      * @param $chainedMethodsBefore

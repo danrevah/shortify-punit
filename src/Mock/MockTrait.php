@@ -67,7 +67,7 @@ trait MockTrait
                 $class .= <<<EOT
                 public function $returnsByReference $methodName ({$methodParams}) {
                     \$args = func_get_args();
-                    \$methodStubbed = {$namespace}\\{$basename}::_is_method_stubbed('{$mockedObjectName}', \$this->mockInstanceId, '{$methodName}', \$args);
+                    \$methodStubbed = {$namespace}\\{$basename}::_is_method_stubbed('{$mockedObjectName}', \$this->mockInstanceId, '{$methodName}');
 
                     if (\$methodStubbed) {
                         return {$namespace}\\{$basename}::_create_response('{$mockedObjectName}', \$this->mockInstanceId, '{$methodName}', \$args);
@@ -100,7 +100,7 @@ EOT;
      */
     protected static function mockClass(\ReflectionClass $reflection, $namespace, $basename, $mockType = MockTypes::FULL)
     {
-        $mockedObjectName = $reflection->getShortName().(MockTypes::PARTIAL ? 'PARTIAL' : 'MOCK');
+        $mockedObjectName = $reflection->getShortName().($mockType == MockTypes::PARTIAL ? 'PARTIAL' : 'MOCK');
 
         $className = $reflection->getName();
         $methods = $reflection->getMethods();
