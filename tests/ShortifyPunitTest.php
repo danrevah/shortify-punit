@@ -209,8 +209,10 @@ class ShortifyPunitTest extends \PHPUnit_Framework_TestCase
         ShortifyPunit::when($mock)->first_method(1,2,3)->second_method(1,2)->third_method()->returns(6);
         ShortifyPunit::when($mock)->first_method(1,2)->second_method(1,3)->third_method()->returns(7);
         ShortifyPunit::when($mock)->first_method(1,2)->second_method(1,8)->third_method()->fourth_method(2)->returns(8);
+        ShortifyPunit::when($mock)->first_method(1,2)->second_method(1,8)->third_method()->fourth_method(3)->returns(9);
+        ShortifyPunit::when($mock)->first_method(1,2)->second_method(1,1)->third_method()->fourth_method(2)->returns(10);
 
-        ShortifyPunit::when($mock)->first_method(equalTo(5))->second_method(1,8)->third_method(anything())->fourth_method(startsWith('foo'))->returns(9);
+        ShortifyPunit::when($mock)->first_method(equalTo(5))->second_method(1,8)->third_method(anything())->fourth_method(startsWith('foo'))->returns(11);
 
         $this->assertEquals($mock->first_method()->second_method(2,3), 1);
         $this->assertEquals($mock->first_method()->second_method(2,3,4), 2);
@@ -220,8 +222,10 @@ class ShortifyPunitTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($mock->first_method(1,2,3)->second_method(1,2)->third_method(), 6);
         $this->assertEquals($mock->first_method(1,2)->second_method(1,3)->third_method(), 7);
         $this->assertEquals($mock->first_method(1,2)->second_method(1,8)->third_method()->fourth_method(2), 8);
+        $this->assertEquals($mock->first_method(1,2)->second_method(1,8)->third_method()->fourth_method(3), 9);
+        $this->assertEquals($mock->first_method(1,2)->second_method(1,1)->third_method()->fourth_method(2), 10);
 
-        $this->assertEquals($mock->first_method(5)->second_method(1,8)->third_method('foo')->fourth_method('foo bar'), 9);
+        $this->assertEquals($mock->first_method(5)->second_method(1,8)->third_method('foo')->fourth_method('foo bar'), 11);
 
         $this->assertNull($mock->first_method(1,2)->second_method());
         $this->assertNull($mock->first_method(1,2)->second_method(1,8)->third_method(312321231));
