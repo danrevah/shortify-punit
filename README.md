@@ -4,6 +4,7 @@
  * [Installation](#installation)
  * [Mocking](#mocking-examples)
  * [Stubbing](#stubbing)
+ * [Spies](#spies)
  * [Stubbing Method Chaning](#stubbing-method-chaining)
  * [Argument Matcher](#argument-matcher)
 
@@ -53,6 +54,26 @@ ShortifyPunit::when($mock)->second_method()->throws(new Exception());
 $mock->second_method(); // throws Exception
 ```
 The `when` function is used to stubbing methods with specific parameters, using throw or return action.
+
+## Spies
+
+```php
+class Foo {
+  function bar() { return 'bar'; }
+}
+
+$mock = ShortifyPunit::mock('Foo');
+$spy = ShortifyPunit::spy('Foo');
+
+$mock->bar(); // returns NULL
+echo $spy->bar(); // prints 'bar'
+
+ShortifyPunit::when($spy)->bar()->returns('foo'); // stubbing spy
+echo $spy->bar(); // prints 'foo'
+```
+
+Spies are a partial mock, sometimes you need the method to behave normally except for the one method that you need to test. That so called partial mocking can be done using ShortifyPunit spy method
+
 
 ## Stubbing Method Chanining
 ```php
