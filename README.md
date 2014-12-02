@@ -74,7 +74,7 @@ ShortifyPunit::when($spy)->bar()->returns('foo'); // stubbing spy
 echo $spy->bar(); // prints 'foo'
 ```
 
-## Stubbing Method Chanining
+## Stubbing Method Chaining
 ```php
  // Creating a new mock for SimpleClassForMocking
  $mock = ShortifyPunit::mock('SimpleClassForMocking');
