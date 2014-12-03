@@ -1,5 +1,6 @@
 #ShortifyPunit &nbsp; [![Build Status](https://travis-ci.org/danrevah/ShortifyPunit.svg?branch=master)](https://travis-ci.org/danrevah/ShortifyPunit)  [![Coverage Status](https://coveralls.io/repos/danrevah/ShortifyPunit/badge.png?branch=master)](https://coveralls.io/repos/danrevah/ShortifyPunit/badge.png?branch=master) ![Code Quality](https://scrutinizer-ci.com/g/danrevah/ShortifyPunit/badges/quality-score.png?b=master)
 > PHP Mocking Framework, **v0.1.5**
+> inspired by Mockito library for Java
 
  * [Installation](#installation)
  * [Mocking](#mocking-examples)
@@ -7,6 +8,7 @@
  * [Spies](#spies)
  * [Stubbing Method Chaning](#stubbing-method-chaining)
  * [Argument Matcher](#argument-matcher)
+ * [TODO] (#todo)
 
 ## Installation
 
@@ -130,3 +132,23 @@ Some common Hamcrest matchers:
 	* `equalToIgnoringCase` - test string equality ignoring case
 	* `equalToIgnoringWhiteSpace` - test string equality ignoring differences in runs of whitespace
 	* `containsString`, `endsWith`, `startsWith` - test string matching
+
+
+## TODO
+
+1. Add Verify behavior to count calls to functions including globals to verify
+should be based on Mockito verify() function
+https://mockito.googlecode.com/hg-history/1.5/javadoc/org/mockito/Mockito.html
+
+Example usage:
+```php
+    $mock = ShortifyPunit::mock('SimpleClassForMocking');
+
+    ShortifyPunit::when($mock)->first_method()->returns(1);
+    echo $mock->first_method();
+
+    ShortifyPunit::verify($mock)->first_method()->neverCalled(); // returns FALSE
+    ShortifyPunit::verify($mock)->first_method()->atLeast(2); // returns FALSE
+    ShortifyPunit::verify($mock)->first_method()->calledTimes(1); // returns TRUE
+
+```

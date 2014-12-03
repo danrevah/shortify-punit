@@ -67,7 +67,6 @@ class ShortifyPunit
 
         $backTrace = debug_backtrace();
         $callingClassName = $backTrace[2]['class'];
-
         $namespace = self::$namespace;
 
         $reflection = new \ReflectionClass($callingClassName);
