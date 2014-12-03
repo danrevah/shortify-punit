@@ -82,8 +82,16 @@ class ShortifyPunit
     }
 
     /**
-     * Mocking interfaces|classes
-     * - Ignoring final and private methods
+     * Mocking interfaces & classes
+     *
+     * @desc Ignoring final and private methods
+     *
+     * Examples:
+     *      // Creating a new mock for SimpleClassForMocking
+     *      $mock = ShortifyPunit::mock('SimpleClassForMocking');
+     *
+     *      // Returns NULL, was not stubbed yet
+     *      $mock->first_method();
      *
      * @param $mockedClass
      * @return mixed
@@ -97,9 +105,23 @@ class ShortifyPunit
 
     /**
      * Partial Mocking interfaces|classes
-     * - Ignoring final and private methods.
      *
-     * Partial mock is not stubbing any function in default (to NULL) like in regular mock()
+     * @desc Partial mock is not stubbing any function by default (to NULL) like in regular mock()
+     *
+     * Examples:
+     *      // class to partial mock / spy
+     *      class Foo {
+     *        function bar() { return 'bar'; }
+     *      }
+     *
+     *      $mock = ShortifyPunit::mock('Foo');
+     *      $spy = ShortifyPunit::spy('Foo');
+     *
+     *      $mock->bar(); // returns NULL
+     *      echo $spy->bar(); // prints 'bar'
+     *
+     *      ShortifyPunit::when($spy)->bar()->returns('foo'); // stubbing spy
+     *      echo $spy->bar(); // prints 'foo'
      *
      * @param $mockedClass
      * @return mixed
@@ -113,6 +135,18 @@ class ShortifyPunit
 
     /**
      * Setting up a when case
+     *
+     * Examples:
+     *      // Chain Stubbing
+     *      ShortifyPunit::when($mock)->first_method()->second_method(1)->returns(1);
+     *      ShortifyPunit::when($mock)->first_method()->second_method(2)->returns(2);
+     *      ShortifyPunit::when($mock)->first_method(1)->second_method(1)->returns(3);
+     *      ShortifyPunit::when($mock)->first_method(2)->second_method(2)->third_method()->returns(4);
+     *
+     *      echo $mock->first_method()->second_method(1); // prints '1'
+     *      echo $mock->first_method()->second_method(2); // prints '2'
+     *      echo $mock->first_method(1)->second_method(1); // prints '3'
+     *      echo $mock->first_method(2)->second_method(2)->third_method(); // prints '4'
      *
      * @param MockInterface $mock
      * @return WhenChainCase
