@@ -33,17 +33,12 @@ trait ArgumentMatcher
                 // Loop both hamcrest and arguments
                 foreach ($arguments as $index => $arg)
                 {
-                    try
-                    {
-                        if ( ! array_key_exists($index, $hamcrest)) {
-                            throw new AssertionError('not enough hamcrest indexes');
-                        }
-
-                        // @throws Assertion error on failure
-                        assertThat($arg, $hamcrest[$index]);
-                    } catch (AssertionError $e) {
-                        throw $e;
+                    if ( ! array_key_exists($index, $hamcrest)) {
+                        throw new AssertionError('not enough hamcrest indexes');
                     }
+
+                    // @throws Assertion error on failure
+                    assertThat($arg, $hamcrest[$index]);
                 }
             }
             catch(AssertionError $e) {
