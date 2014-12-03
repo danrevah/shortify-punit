@@ -305,6 +305,8 @@ class ShortifyPunitTest extends \PHPUnit_Framework_TestCase
         ShortifyPunit::when($mock)->first_method(2)->second_method(anything(), equalTo(1))->returns(3);
         ShortifyPunit::when($mock)->first_method(3)->second_method(containsString('foo bar'), anInstanceOf('SimpleClassForMocking'))->returns(4);
         ShortifyPunit::when($mock)->first_method(equalTo(4))->second_method(1)->returns(5);
+        ShortifyPunit::when($mock)->first_method(equalTo(5))->second_method(not(1))->third_method(anyOf(1,2,3))->returns(6);
+        ShortifyPunit::when($mock)->first_method(equalTo(5))->second_method(not(1))->third_method(anything())->returns(7);
 
         $this->assertEquals($mock->first_method()->second_method(1), 1);
         $this->assertEquals($mock->first_method()->second_method(array()), 1);
@@ -322,6 +324,10 @@ class ShortifyPunitTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($mock->first_method(3)->second_method('foo bar', new Exception()));
 
         $this->assertEquals($mock->first_method(4)->second_method(1), 5);
+
+        $this->assertEquals($mock->first_method(5)->second_method(2)->third_method(1), 6);
+        $this->assertEquals($mock->first_method(5)->second_method(3)->third_method(2), 6);
+        $this->assertEquals($mock->first_method(5)->second_method(2)->third_method(4), 7);
     }
 
     /**
