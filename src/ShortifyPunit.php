@@ -83,11 +83,8 @@ class ShortifyPunit
         $callingClassName = $backTrace[2]['class'];
         $namespace = self::$namespace;
 
-        $reflection = new \ReflectionClass($callingClassName);
 
-        if ( ! $reflection->implementsInterface("{$namespace}\\Mock\\MockInterface") &&
-             ! in_array($callingClassName, self::$friendClasses))
-        {
+        if ( ! self::isFriendClass($callingClassName, $namespace)){
             throw self::generateException("{$class} is not a friend class!");
         }
 
@@ -355,5 +352,22 @@ class ShortifyPunit
             throw self::generateException("Unable to mock class {$mockedClass} declared as final");
         }
         return $reflection;
+    }
+
+    /**
+     * @param $callingClassName
+     * @param $namespace
+     * @return bool
+     */
+    private static function isFriendClass($callingClassName, $namespace)
+    {
+        $reflection = new \ReflectionClass($callingClassName);
+
+        if ( ! $reflection->implementsInterface("{$namespace}\\Mock\\MockInterface") &&
+             ! in_array($callingClassName, self::$friendClasses)) {
+            return false;
+        }
+
+        return true;
     }
 }
