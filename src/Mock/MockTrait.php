@@ -10,8 +10,8 @@ trait MockTrait
     use ExceptionFactory;
     /**
      * @param \ReflectionMethod[] $methods
-     * @param $namespace
-     * @param $basename
+     * @param string $namespace
+     * @param string $basename
      * @param string $mockedObjectName
      * @param $class
      * @param string $mockType

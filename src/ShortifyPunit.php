@@ -3,7 +3,6 @@ namespace ShortifyPunit;
 
 use ShortifyPunit\Enums\MockTypes;
 use ShortifyPunit\Mock\MockInterface;
-use ShortifyPunit\Exceptions\ExceptionFactory;
 use ShortifyPunit\Mock\MockTrait;
 use ShortifyPunit\Stub\WhenChainCase;
 
