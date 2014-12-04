@@ -7,6 +7,11 @@ use ShortifyPunit\ShortifyPunit;
 /**
  * Class WhenCase
  * @package ShortifyPunit
+ *
+ * @method returns($value)
+ * @method throws($exception)
+ * @method callback($callback)
+ *
  * @desc When Case, is used to set up mocking response using specific call arguments
  *       and return action (throw exception, return value, ..)
  */

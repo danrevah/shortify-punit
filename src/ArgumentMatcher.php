@@ -14,7 +14,7 @@ trait ArgumentMatcher
      * @param $returnValues - Current return values hierarchy with the current method name
      * @param $arguments - Arguments to match
      *
-     * @return NULL | Hamcrest Object
+     * @return NULL or Hamcrest
      */
     protected static function checkMatchingArguments($returnValues, $arguments)
     {

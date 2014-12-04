@@ -10,6 +10,17 @@ use ShortifyPunit\Mock\MockTrait;
 use ShortifyPunit\Stub\WhenCase;
 use ShortifyPunit\Stub\WhenChainCase;
 
+/**
+ * Class ShortifyPunit
+ * @package ShortifyPunit
+ *
+ * @method static addChainedResponse($response)
+ * @method static createResponse($className, $instanceId, $methodName, $arguments)
+ * @method static isMethodStubbed($className, $instanceId, $methodName)
+ * @method static createChainResponse($chainedMethodsBefore, $currentMethod, $args)
+ * @method static setWhenMockResponse($className, $instanceId, $methodName, $args, $action, $returns)
+ * @method static generateInstanceId()
+ */
 class ShortifyPunit
 {
     use ArgumentMatcher, MockTrait;
@@ -60,6 +71,9 @@ class ShortifyPunit
     public static function __callStatic($name, $arguments)
     {
         $class = get_called_class();
+
+        // protected shared methods has `_` prefix to identify
+        $name = "_{$name}";
 
         if ( ! method_exists($class, $name)) {
             throw self::generateException("{$class} has no such method!");
@@ -183,7 +197,7 @@ class ShortifyPunit
      * @param $methodName
      * @return bool
      */
-    protected static function _is_method_stubbed($className, $instanceId, $methodName)
+    protected static function _isMethodStubbed($className, $instanceId, $methodName)
     {
         // check if instance of this method even exist
         if ( ! isset(self::$returnValues[$className][$methodName][$instanceId])) {
@@ -200,7 +214,7 @@ class ShortifyPunit
      * @param $args
      * @return null
      */
-    protected static function _create_chain_response($chainedMethodsBefore, $currentMethod, $args)
+    protected static function _createChainResponse($chainedMethodsBefore, $currentMethod, $args)
     {
         $rReturnValues = &self::$returnValues;
         $currentMethodName = key($currentMethod);
@@ -236,7 +250,7 @@ class ShortifyPunit
 
         $response = $response['response'];
 
-        return self::createResponse($response, $args);
+        return self::generateResponse($response, $args);
     }
 
 
@@ -251,7 +265,7 @@ class ShortifyPunit
      * @param $action
      * @param $returns
      */
-    protected static function setWhenMockResponse($className, $instanceId, $methodName, $args, $action, $returns)
+    protected static function _setWhenMockResponse($className, $instanceId, $methodName, $args, $action, $returns)
     {
         $args = serialize($args);
 
@@ -262,7 +276,7 @@ class ShortifyPunit
      * Generating instance id, function is called from mocked classes using `friend classes` style
      * @return int
      */
-    protected static function generateInstanceId()
+    protected static function _generateInstanceId()
     {
         return ++self::$instanceId;
     }
@@ -278,7 +292,7 @@ class ShortifyPunit
      * @internal param $args
      * @return Mixed | null
      */
-    protected static function _create_response($className, $instanceId, $methodName, $arguments)
+    protected static function _createResponse($className, $instanceId, $methodName, $arguments)
     {
         $args = serialize($arguments);
 
@@ -292,7 +306,7 @@ class ShortifyPunit
         {
             $return = self::$returnValues[$className][$methodName][$instanceId][$args];
 
-            return self::createResponse($return, $arguments);
+            return self::generateResponse($return, $arguments);
         }
 
 
@@ -306,7 +320,7 @@ class ShortifyPunit
 
         $return = self::$returnValues[$className][$methodName][$instanceId][$args];
 
-        return self::createResponse($return, $arguments);
+        return self::generateResponse($return, $arguments);
     }
 
     /**
@@ -314,7 +328,7 @@ class ShortifyPunit
      *
      * @param $response
      */
-    protected static function addChainedResponse($response)
+    protected static function _addChainedResponse($response)
     {
         $firstChainedMethodName = key($response);
 

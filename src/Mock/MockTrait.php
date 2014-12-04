@@ -70,10 +70,10 @@ trait MockTrait
                 $class .= <<<EOT
                 public function $returnsByReference $methodName ({$methodParams}) {
                     \$args = func_get_args();
-                    \$methodStubbed = {$namespace}\\{$basename}::_is_method_stubbed('{$mockedObjectName}', \$this->mockInstanceId, '{$methodName}');
+                    \$methodStubbed = {$namespace}\\{$basename}::isMethodStubbed('{$mockedObjectName}', \$this->mockInstanceId, '{$methodName}');
 
                     if (\$methodStubbed) {
-                        return {$namespace}\\{$basename}::_create_response('{$mockedObjectName}', \$this->mockInstanceId, '{$methodName}', \$args);
+                        return {$namespace}\\{$basename}::createResponse('{$mockedObjectName}', \$this->mockInstanceId, '{$methodName}', \$args);
                     } else {
                         return call_user_func_array(array('parent', __FUNCTION__), \$args);
                     }
@@ -84,7 +84,7 @@ EOT;
             {
                 $class .= <<<EOT
                 public function $returnsByReference $methodName ({$methodParams}) {
-                    return {$namespace}\\{$basename}::_create_response('{$mockedObjectName}', \$this->mockInstanceId, '{$methodName}', func_get_args());
+                    return {$namespace}\\{$basename}::createResponse('{$mockedObjectName}', \$this->mockInstanceId, '{$methodName}', func_get_args());
                 }
 EOT;
             }
@@ -151,7 +151,7 @@ EOT;
      * @param $arguments
      * @return mixed
      */
-    protected static function createResponse($response, $arguments)
+    protected static function generateResponse($response, $arguments)
     {
         list($action, $value) = self::extractResponseValues($response);
 
