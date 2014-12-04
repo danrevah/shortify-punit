@@ -298,21 +298,16 @@ class ShortifyPunit
             return NULL;
         }
 
-        // Check if exist as-is in return values array
-        if (isset(self::$returnValues[$className][$methodName][$instanceId][$args]))
+        // Check if doesn't exist as-is in return values array
+        if ( ! isset(self::$returnValues[$className][$methodName][$instanceId][$args]))
         {
-            $return = self::$returnValues[$className][$methodName][$instanceId][$args];
+            // try to finding matching Hamcrest-API Function (anything(), equalTo())
+            $returnValues = self::$returnValues[$className][$methodName][$instanceId];
+            $args = static::checkMatchingArguments($returnValues, $arguments);
 
-            return self::generateResponse($return, $arguments);
-        }
-
-
-        // try to finding matching Hamcrest-API Function (anything(), equalTo())
-        $returnValues = self::$returnValues[$className][$methodName][$instanceId];
-        $args = static::checkMatchingArguments($returnValues, $arguments);
-
-        if (is_null($args)) {
-            return NULL;
+            if (is_null($args)) {
+                return NULL;
+            }
         }
 
         $return = self::$returnValues[$className][$methodName][$instanceId][$args];
