@@ -209,19 +209,9 @@ class ShortifyPunit
      */
     protected static function _createChainResponse($chainedMethodsBefore, $currentMethod, $args)
     {
-        $rReturnValues = &self::$returnValues;
+
         $currentMethodName = key($currentMethod);
-
-        // Check return values chain
-        foreach ($chainedMethodsBefore as $chainedMethod)
-        {
-            $chainedMethodName = key($chainedMethod);
-            $chainedMethodArgs = $chainedMethod[$chainedMethodName];
-
-            $serializedChainMethodArgs = serialize($chainedMethodArgs);
-
-            $rReturnValues = &$rReturnValues[$chainedMethodName][$serializedChainMethodArgs];
-        }
+        $rReturnValues = self::getMockHierarchyResponse($chainedMethodsBefore);
 
         // Check current method exist in return values chain
         $serializedArgs = serialize($args);
@@ -360,5 +350,24 @@ class ShortifyPunit
         }
 
         return true;
+    }
+
+    /**
+     * @param $chainedMethodsBefore
+     * @return mixed
+     */
+    private static function getMockHierarchyResponse($chainedMethodsBefore)
+    {
+        $rReturnValues = &self::$returnValues;
+        // Check return values chain
+        foreach ($chainedMethodsBefore as $chainedMethod) {
+            $chainedMethodName = key($chainedMethod);
+            $chainedMethodArgs = $chainedMethod[$chainedMethodName];
+
+            $serializedChainMethodArgs = serialize($chainedMethodArgs);
+
+            $rReturnValues = & $rReturnValues[$chainedMethodName][$serializedChainMethodArgs];
+        }
+        return $rReturnValues;
     }
 }

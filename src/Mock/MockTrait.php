@@ -129,12 +129,13 @@ EOT;
         $class = <<<EOT
   $namespaceDeclaration
   class $mockedObjectName $extends $className $marker {
-   public \$mockInstanceId;
+   private \$mockInstanceId;
 
    public function __construct() {
         \$this->mockInstanceId = {$namespace}\\{$basename}::generateInstanceId();
    }
 
+   public function getInstanceId() { return \$this->mockInstanceId; }
 EOT;
         $class = self::mockClassMethods($methods, $namespace, $basename, $mockedObjectName, $class, $mockType);
         $class .= '}';

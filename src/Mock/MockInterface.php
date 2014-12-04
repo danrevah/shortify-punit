@@ -8,4 +8,8 @@ namespace ShortifyPunit\Mock;
  */
 interface MockInterface
 {
+    /**
+     * @return integer
+     */
+    public function getInstanceId();
 }

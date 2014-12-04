@@ -182,13 +182,13 @@ class ShortifyPunitTest extends \PHPUnit_Framework_TestCase
     public function testInstanceIdOfMocks()
     {
         $mock = ShortifyPunit::mock('SimpleClassForMocking');
-        $instanceId = $mock->mockInstanceId;
+        $instanceId = $mock->getInstanceId();
 
         $mockTwo = ShortifyPunit::mock('SimpleClassForMocking');
         $mockThree = ShortifyPunit::mock('SimpleClassForMocking');
 
-        $this->assertEquals($instanceId+1, $mockTwo->mockInstanceId);
-        $this->assertEquals($instanceId+2, $mockThree->mockInstanceId);
+        $this->assertEquals($instanceId+1, $mockTwo->getInstanceId());
+        $this->assertEquals($instanceId+2, $mockThree->getInstanceId());
     }
 
     /**

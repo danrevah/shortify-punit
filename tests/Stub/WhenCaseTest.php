@@ -16,7 +16,7 @@ class ShortifyPunitWhenCaseTest extends \PHPUnit_Framework_TestCase
     public function testMethodWhenCalls()
     {
         $mock = ShortifyPunit::mock('\Exception');
-        $whenCase = new WhenCase(get_class($mock), $mock->mockInstanceId);
+        $whenCase = new WhenCase(get_class($mock), $mock->getInstanceId());
         $whenCase->test(array());
     }
 
@@ -26,7 +26,7 @@ class ShortifyPunitWhenCaseTest extends \PHPUnit_Framework_TestCase
     public function testMethodWhenCallsAllowedActions()
     {
         $mock = ShortifyPunit::mock('\Exception');
-        $whenCase = new WhenCase(get_class($mock), $mock->mockInstanceId, 'abc');
+        $whenCase = new WhenCase(get_class($mock), $mock->getInstanceId(), 'abc');
         $whenCase->test();
     }
 
@@ -36,7 +36,7 @@ class ShortifyPunitWhenCaseTest extends \PHPUnit_Framework_TestCase
     public function testNoSuchAction()
     {
         $mock = ShortifyPunit::mock('Foo');
-        $whenCase = new WhenCase(get_class($mock), $mock->mockInstanceId);
+        $whenCase = new WhenCase(get_class($mock), $mock->getInstanceId());
         $whenCase->bar(array())->foobar(array());
     }
 
@@ -47,7 +47,7 @@ class ShortifyPunitWhenCaseTest extends \PHPUnit_Framework_TestCase
     public function testWhenCaseAddMethod()
     {
         $mock = ShortifyPunit::mock('Foo');
-        $whenCase = new WhenCase(get_class($mock), $mock->mockInstanceId);
+        $whenCase = new WhenCase(get_class($mock), $mock->getInstanceId());
         $whenCase->bar(array())->returns(array());
     }
 

@@ -22,7 +22,7 @@ class WhenChainCase
     /**
      * @param MockInterface $class
      */
-    public function __construct(MockInterface $class)
+    public function __construct($class)
     {
         $this->mockClass = $class;
     }
@@ -83,7 +83,11 @@ class WhenChainCase
             $action = MockAction::RETURNS;
         }
 
-        $whenCase = new WhenCase(get_class($this->mockClass), $this->mockClass->mockInstanceId, key($firstMethod));
+        if ( ! $this->mockClass instanceof MockInterface) {
+            throw self::generateException('Class is not implementing MockInterface.');
+        }
+
+        $whenCase = new WhenCase(get_class($this->mockClass), $this->mockClass->getInstanceId(), key($firstMethod));
         $whenCase->setMethod(current($firstMethod), $action, $lastValue);
     }
 
