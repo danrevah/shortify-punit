@@ -3,6 +3,7 @@ namespace ShortifyPunit\Stub;
 use ShortifyPunit\Mock\MockClassOnTheFly;
 use ShortifyPunit\Enums\MockAction;
 use ShortifyPunit\Exceptions\ExceptionFactory;
+use ShortifyPunit\Mock\MockInterface;
 use ShortifyPunit\ShortifyPunit;
 
 /**
@@ -19,9 +20,9 @@ class WhenChainCase
     private $mockClass;
 
     /**
-     * @param \ShortifyPunit\Mock\MockInterface $class
+     * @param MockInterface $class
      */
-    public function __construct($class)
+    public function __construct(MockInterface $class)
     {
         $this->mockClass = $class;
     }
