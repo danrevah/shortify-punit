@@ -1,13 +1,10 @@
 <?php
 namespace ShortifyPunit;
 
-use Hamcrest\AssertionError;
 use ShortifyPunit\Enums\MockTypes;
 use ShortifyPunit\Mock\MockInterface;
-use ShortifyPunit\Enums\MockAction;
 use ShortifyPunit\Exceptions\ExceptionFactory;
 use ShortifyPunit\Mock\MockTrait;
-use ShortifyPunit\Stub\WhenCase;
 use ShortifyPunit\Stub\WhenChainCase;
 
 /**
@@ -351,7 +348,7 @@ class ShortifyPunit
 
     /**
      * @param $callingClassName
-     * @param $namespace
+     * @param string $namespace
      * @return bool
      */
     private static function isFriendClass($callingClassName, $namespace)

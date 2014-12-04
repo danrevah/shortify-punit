@@ -9,12 +9,12 @@ trait MockTrait
 {
     use ExceptionFactory;
     /**
-     * @param $methods
+     * @param \ReflectionMethod[] $methods
      * @param $namespace
      * @param $basename
-     * @param $mockedObjectName
+     * @param string $mockedObjectName
      * @param $class
-     * @param $mockType
+     * @param string $mockType
      * @return string
      */
     protected static function mockClassMethods($methods, $namespace, $basename, $mockedObjectName, $class, $mockType)
@@ -96,8 +96,8 @@ EOT;
 
     /**
      * @param \ReflectionClass $reflection
-     * @param $namespace
-     * @param $basename
+     * @param string $namespace
+     * @param string $basename
      * @param string $mockType
      * @return mixed
      */

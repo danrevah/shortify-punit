@@ -24,6 +24,11 @@ class WhenCase
     private $args;
     private $instanceId;
 
+    /**
+     * @param string $className
+     * @param $instanceId
+     * @param string $method
+     */
     public function __construct($className, $instanceId, $method = '')
     {
         $this->className = $className;

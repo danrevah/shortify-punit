@@ -18,6 +18,9 @@ class WhenChainCase
     private $methods = [];
     private $mockClass;
 
+    /**
+     * @param \ShortifyPunit\Mock\MockInterface $class
+     */
     public function __construct($class)
     {
         $this->mockClass = $class;
