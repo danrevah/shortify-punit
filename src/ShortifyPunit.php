@@ -41,10 +41,10 @@ class ShortifyPunit
      * @var array - return values of mocked functions by instance id
      *
      * Nesting:
-     *   - Single Stub: [className][methodName][instanceId][args] = array('action' => ..., 'value' => ...)
+     *   - Single Stub: [className][instanceId][methodName][args] = array('action' => ..., 'value' => ...)
      *   - Multiple Stubbing:
      *     - For the first method using the single stub
-     *     - For the rest of the methods: [methodName][args]...[methodName][args]... = array('response' => array('action' => ..., 'value' => ...))
+     *     - For the rest of the methods: [className][instanceId][methodName][args]...[methodName][args]... = array('response' => array('action' => ..., 'value' => ...))
      */
     private static $returnValues = [];
 
@@ -203,7 +203,7 @@ class ShortifyPunit
     protected static function _isMethodStubbed($className, $instanceId, $methodName)
     {
         // check if instance of this method even exist
-        if ( ! isset(self::$returnValues[$className][$methodName][$instanceId])) {
+        if ( ! isset(self::$returnValues[$className][$instanceId][$methodName])) {
             return FALSE;
         }
 
@@ -257,7 +257,9 @@ class ShortifyPunit
     {
         $args = serialize($args);
 
-        self::$returnValues[$className][$instanceId][$methodName][$args] = ['action' => $action, 'value' => $returns];
+        $returnValues[$className][$instanceId][$methodName][$args]['response'] = ['action' => $action, 'value' => $returns];
+
+        self::_addChainedResponse($returnValues);
     }
 
     /**
@@ -290,7 +292,7 @@ class ShortifyPunit
         }
 
         // Check if doesn't exist as-is in return values array
-        if ( ! isset(self::$returnValues[$className][$instanceId][$methodName][$args]))
+        if ( ! isset(self::$returnValues[$className][$instanceId][$methodName][$args]['response']))
         {
             // try to finding matching Hamcrest-API Function (anything(), equalTo())
             $returnValues = self::$returnValues[$className][$instanceId][$methodName];
@@ -301,7 +303,7 @@ class ShortifyPunit
             }
         }
 
-        return self::generateResponse(self::$returnValues[$className][$instanceId][$methodName][$args], $arguments);
+        return self::generateResponse(self::$returnValues[$className][$instanceId][$methodName][$args]['response'], $arguments);
     }
 
     /**

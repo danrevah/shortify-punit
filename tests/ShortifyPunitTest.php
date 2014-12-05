@@ -214,6 +214,7 @@ class ShortifyPunitTest extends \PHPUnit_Framework_TestCase
 
         ShortifyPunit::when($mock)->first_method(equalTo(5))->second_method(1,8)->third_method(anything())->fourth_method(startsWith('foo'))->returns(11);
 
+        // @TODO REMOVE
         $this->assertEquals($mock->first_method()->second_method(2,3), 1);
         $this->assertEquals($mock->first_method()->second_method(2,3,4), 2);
         $this->assertEquals($mock->first_method(1)->second_method(2,3,4), 3);

@@ -61,6 +61,11 @@ class WhenChainCase
         $lastValue = $response;
 
         $mockClassType = get_class($this->mockClass);
+
+        if ( ! $this->mockClass instanceof MockInterface) {
+            throw self::generateException('Class is not implementing MockInterface.');
+        }
+
         $mockClassInstanceId = $this->mockClass->getInstanceId();
 
         foreach($methods as $currentMethod)
@@ -86,9 +91,7 @@ class WhenChainCase
             $action = MockAction::RETURNS;
         }
 
-        if ( ! $this->mockClass instanceof MockInterface) {
-            throw self::generateException('Class is not implementing MockInterface.');
-        }
+
 
         $whenCase = new WhenCase($mockClassType, $this->mockClass->getInstanceId(), key($firstMethod));
         $whenCase->setMethod(current($firstMethod), $action, $lastValue);
