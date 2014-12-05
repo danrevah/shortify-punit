@@ -6,9 +6,9 @@
  * [Mocking](#mocking-examples)
  * [Stubbing](#stubbing)
  * [Spies](#spies)
- * [Stubbing Method Chaning](#stubbing-method-chaining)
+ * [Stubbing Method Chaining](#stubbing-method-chaining)
+ * [Verifying](#verifying)
  * [Argument Matcher](#argument-matcher)
- * [TODO] (#todo)
 
 ## Installation
 
@@ -93,6 +93,27 @@ echo $spy->bar(); // prints 'foo'
 ```
 `when` function is also used to stub chained methods, using the same actions as the single function stubbing `return` `throw` or `callback`.
 
+## Verifying
+
+Once created, mock will remember all invocations. Then you can selectively verify whatever interaction you are inserted in.
+
+```php
+    $mock = ShortifyPunit::mock('SimpleClassForMocking');
+
+    ShortifyPunit::when($mock)->first_method()->returns(1);
+    echo $mock->first_method(); // method called once
+
+    ShortifyPunit::verify($mock)->first_method()->neverCalled(); // returns FALSE (method has been called once)
+    ShortifyPunit::verify($mock)->first_method()->atLeast(2); // returns FALSE (method has been called once)
+    ShortifyPunit::verify($mock)->first_method()->calledTimes(1); // returns TRUE (method has been called once)
+
+    echo $mock->first_method(); // method has been called twice
+
+    ShortifyPunit::verify($mock)->first_method()->neverCalled(); // returns FALSE (method has been called twice)
+    ShortifyPunit::verify($mock)->first_method()->atLeast(2); // returns TRUE (method has been called twice)
+    ShortifyPunit::verify($mock)->first_method()->calledTimes(2); // returns TRUE (method has been called twice)
+```
+
 
 ## Argument Matcher
 
@@ -132,23 +153,3 @@ Some common Hamcrest matchers:
 	* `equalToIgnoringCase` - test string equality ignoring case
 	* `equalToIgnoringWhiteSpace` - test string equality ignoring differences in runs of whitespace
 	* `containsString`, `endsWith`, `startsWith` - test string matching
-
-
-## TODO
-
-1. Add Verify behavior to count calls to functions including globals to verify
-should be based on Mockito verify() function
-https://mockito.googlecode.com/hg-history/1.5/javadoc/org/mockito/Mockito.html
-
-Example usage:
-```php
-    $mock = ShortifyPunit::mock('SimpleClassForMocking');
-
-    ShortifyPunit::when($mock)->first_method()->returns(1);
-    echo $mock->first_method();
-
-    ShortifyPunit::verify($mock)->first_method()->neverCalled(); // returns FALSE
-    ShortifyPunit::verify($mock)->first_method()->atLeast(2); // returns FALSE
-    ShortifyPunit::verify($mock)->first_method()->calledTimes(1); // returns TRUE
-
-```
