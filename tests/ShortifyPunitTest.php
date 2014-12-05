@@ -260,38 +260,12 @@ class ShortifyPunitTest extends \PHPUnit_Framework_TestCase
     {
         $mock = ShortifyPunit::mock('SimpleClassForMocking');
 
+        ShortifyPunit::setReturnValues(array());
         ShortifyPunit::when($mock)->first_method()->second_method(2,3)->throws('Exception');
 
         $mock->first_method()->second_method(2,3);
     }
 
-    /**
-     * @expectedException PHPUnit_Framework_AssertionFailedError
-     */
-    public function testChainStubbingCorruptDataReturnValue()
-    {
-        $mock = ShortifyPunit::mock('SimpleClassForMocking');
-
-        ShortifyPunit::when($mock)->first_method()->second_method(2,3)->returns(1);
-        $response = ShortifyPunit::getReturnValues();
-        $response['first_method']['a:0:{}']['second_method']['a:2:{i:0;i:2;i:1;i:3;}'] = ['response' => []];
-        ShortifyPunit::setReturnValues($response);
-        $mock->first_method()->second_method(2,3);
-    }
-
-    /**
-     * @expectedException \PHPUnit_Framework_AssertionFailedError
-     */
-    public function testReturnNotAllowedArguments()
-    {
-        $mock = ShortifyPunit::mock('SimpleClassForMocking');
-
-        ShortifyPunit::when($mock)->first_method()->second_method(2,3)->returns(1);
-        $response = ShortifyPunit::getReturnValues();
-        $response['first_method']['a:0:{}']['second_method'] = ['a:2:{i:0;i:2;i:1;i:3;}' => []];
-        ShortifyPunit::setReturnValues($response);
-        $mock->first_method()->second_method(2,3);
-    }
 
     /**
      * Testing the hamcrest functions

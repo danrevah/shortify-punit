@@ -5,6 +5,7 @@ use ShortifyPunit\Enums\MockTypes;
 use ShortifyPunit\Mock\MockInterface;
 use ShortifyPunit\Mock\MockTrait;
 use ShortifyPunit\Stub\WhenChainCase;
+use ShortifyPunit\Verify\Verify;
 
 /**
  * Class ShortifyPunit
@@ -13,7 +14,7 @@ use ShortifyPunit\Stub\WhenChainCase;
  * @method static addChainedResponse($response)
  * @method static createResponse($className, $instanceId, $methodName, $arguments)
  * @method static isMethodStubbed($className, $instanceId, $methodName)
- * @method static createChainResponse($chainedMethodsBefore, $currentMethod, $args)
+ * @method static createChainResponse($mockClassType, $chainedMethodsBefore, $currentMethod, $args)
  * @method static setWhenMockResponse($className, $instanceId, $methodName, $args, $action, $returns)
  * @method static generateInstanceId()
  */
@@ -166,6 +167,15 @@ class ShortifyPunit
         return new WhenChainCase($mock);
     }
 
+    public static function Verify($mock)
+    {
+        if ( ! $mock instanceof MockInterface) {
+            throw self::generateException('verify() must get a mocked instance as parameter');
+        }
+
+        return new Verify($mock);
+    }
+
     /**
      * @return array
      */
@@ -199,24 +209,26 @@ class ShortifyPunit
 
         return TRUE;
     }
+
     /**
      * Setting up a chained mock response, function is called from mocked classes using `friend classes` style
      *
+     * @param $mockClassType
      * @param $chainedMethodsBefore
      * @param $currentMethod
      * @param $args
      * @return null
      */
-    protected static function _createChainResponse($chainedMethodsBefore, $currentMethod, $args)
+    protected static function _createChainResponse($mockClassType, $chainedMethodsBefore, $currentMethod, $args)
     {
 
         $currentMethodName = key($currentMethod);
-        $rReturnValues = self::getMockHierarchyResponse($chainedMethodsBefore);
+        $rReturnValues = &self::getMockHierarchyResponse($chainedMethodsBefore, $mockClassType);
 
         // Check current method exist in return values chain
         $serializedArgs = serialize($args);
 
-        if ( ! isset($rReturnValues[$currentMethodName][$serializedArgs]))
+        if ( ! isset($rReturnValues[$currentMethodName][$serializedArgs]['response']))
         {
             $serializedArgs = static::checkMatchingArguments($rReturnValues[$currentMethodName], $args);
 
@@ -225,15 +237,7 @@ class ShortifyPunit
             }
         }
 
-        $response = $rReturnValues[$currentMethodName][$serializedArgs];
-
-        if ( ! array_key_exists('response', $response)) {
-            throw self::generateException('Create chain response corrupt response return values');
-        }
-
-        $response = $response['response'];
-
-        return self::generateResponse($response, $args);
+        return self::generateResponse($rReturnValues[$currentMethodName][$serializedArgs]['response'], $args);
     }
 
 
@@ -296,9 +300,7 @@ class ShortifyPunit
             }
         }
 
-        $return = self::$returnValues[$className][$methodName][$instanceId][$args];
-
-        return self::generateResponse($return, $arguments);
+        return self::generateResponse(self::$returnValues[$className][$methodName][$instanceId][$args], $arguments);
     }
 
     /**
@@ -354,11 +356,12 @@ class ShortifyPunit
 
     /**
      * @param $chainedMethodsBefore
+     * @param $mockClassType
      * @return mixed
      */
-    private static function getMockHierarchyResponse($chainedMethodsBefore)
+    private static function &getMockHierarchyResponse($chainedMethodsBefore, $mockClassType)
     {
-        $rReturnValues = &self::$returnValues;
+        $rReturnValues = &self::$returnValues[$mockClassType];
         // Check return values chain
         foreach ($chainedMethodsBefore as $chainedMethod) {
             $chainedMethodName = key($chainedMethod);

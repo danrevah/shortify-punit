@@ -32,7 +32,7 @@ class WhenChainCase
         // add to method list if not an action
         if ( ! in_array($method, array(MockAction::RETURNS, MockAction::THROWS, MockAction::CALLBACK)))
         {
-            array_unshift($this->methods, array($method => $args));
+            array_unshift($this->methods, [$method => $args]);
             return $this;
         }
 
@@ -60,6 +60,8 @@ class WhenChainCase
 
         $lastValue = $response;
 
+        $mockClassType = get_class($this->mockClass);
+
         foreach($methods as $currentMethod)
         {
             $fakeClass = new MockClassOnTheFly();
@@ -73,8 +75,8 @@ class WhenChainCase
             $currentMethodName = key($currentMethod);
 
             // closure for MockOnTheFly chained methods
-            $fakeClass->$currentMethodName = function() use ($chainedMethodsBefore, $currentMethod) {
-                return ShortifyPunit::createChainResponse($chainedMethodsBefore, $currentMethod, func_get_args());
+            $fakeClass->$currentMethodName = function() use ($mockClassType, $chainedMethodsBefore, $currentMethod) {
+                return ShortifyPunit::createChainResponse($mockClassType, $chainedMethodsBefore, $currentMethod, func_get_args());
             };
 
             $lastValue = $fakeClass;
@@ -87,7 +89,7 @@ class WhenChainCase
             throw self::generateException('Class is not implementing MockInterface.');
         }
 
-        $whenCase = new WhenCase(get_class($this->mockClass), $this->mockClass->getInstanceId(), key($firstMethod));
+        $whenCase = new WhenCase($mockClassType, $this->mockClass->getInstanceId(), key($firstMethod));
         $whenCase->setMethod(current($firstMethod), $action, $lastValue);
     }
 
@@ -118,7 +120,7 @@ class WhenChainCase
 
         $rResponse[$currentMethodName][serialize(current($currentMethod))] = ['response' => ['action' => $action, 'value' => $lastValue]];
 
-        ShortifyPunit::addChainedResponse($response);
+        ShortifyPunit::addChainedResponse([get_class($this->mockClass) => $response]);
     }
 
     /**
