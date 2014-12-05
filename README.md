@@ -93,6 +93,26 @@ echo $spy->bar(); // prints 'foo'
 ```
 `when` function is also used to stub chained methods, using the same actions as the single function stubbing `return` `throw` or `callback`.
 
+## Verifying
+
+Once created, mock will remember all invocations. Then you can selectively verify whatever interaction you are inserted in.
+
+```php
+    $mock = ShortifyPunit::mock('SimpleClassForMocking');
+
+    ShortifyPunit::when($mock)->first_method()->returns(1);
+    echo $mock->first_method(); // method called once
+
+    ShortifyPunit::verify($mock)->first_method()->neverCalled(); // returns FALSE
+    ShortifyPunit::verify($mock)->first_method()->atLeast(2); // returns FALSE
+    ShortifyPunit::verify($mock)->first_method()->calledTimes(1); // returns TRUE
+
+    echo $mock->first_method(); // method has been called twice
+
+    ShortifyPunit::verify($mock)->first_method()->neverCalled(); // returns FALSE
+    ShortifyPunit::verify($mock)->first_method()->atLeast(2); // returns TRUE
+    ShortifyPunit::verify($mock)->first_method()->calledTimes(2); // returns TRUE
+```
 
 ## Argument Matcher
 
