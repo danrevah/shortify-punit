@@ -14,7 +14,7 @@ use ShortifyPunit\Verify\Verify;
  * @method static addChainedResponse($response)
  * @method static createResponse($className, $instanceId, $methodName, $arguments)
  * @method static isMethodStubbed($className, $instanceId, $methodName)
- * @method static createChainResponse($mockClassType, $chainedMethodsBefore, $currentMethod, $args)
+ * @method static createChainResponse($mockClassInstanceId, $mockClassType, $chainedMethodsBefore, $currentMethod, $args)
  * @method static setWhenMockResponse($className, $instanceId, $methodName, $args, $action, $returns)
  * @method static generateInstanceId()
  */
@@ -213,17 +213,18 @@ class ShortifyPunit
     /**
      * Setting up a chained mock response, function is called from mocked classes using `friend classes` style
      *
+     * @param $mockClassInstanceId
      * @param $mockClassType
      * @param $chainedMethodsBefore
      * @param $currentMethod
      * @param $args
      * @return null
      */
-    protected static function _createChainResponse($mockClassType, $chainedMethodsBefore, $currentMethod, $args)
+    protected static function _createChainResponse($mockClassInstanceId, $mockClassType, $chainedMethodsBefore, $currentMethod, $args)
     {
 
         $currentMethodName = key($currentMethod);
-        $rReturnValues = &self::getMockHierarchyResponse($chainedMethodsBefore, $mockClassType);
+        $rReturnValues = &self::getMockHierarchyResponse($chainedMethodsBefore, $mockClassType, $mockClassInstanceId);
 
         // Check current method exist in return values chain
         $serializedArgs = serialize($args);
@@ -256,7 +257,7 @@ class ShortifyPunit
     {
         $args = serialize($args);
 
-        self::$returnValues[$className][$methodName][$instanceId][$args] = ['action' => $action, 'value' => $returns];
+        self::$returnValues[$className][$instanceId][$methodName][$args] = ['action' => $action, 'value' => $returns];
     }
 
     /**
@@ -284,15 +285,15 @@ class ShortifyPunit
         $args = serialize($arguments);
 
         // check if instance of this method even exist
-        if ( ! isset(self::$returnValues[$className][$methodName][$instanceId])) {
+        if ( ! isset(self::$returnValues[$className][$instanceId][$methodName])) {
             return NULL;
         }
 
         // Check if doesn't exist as-is in return values array
-        if ( ! isset(self::$returnValues[$className][$methodName][$instanceId][$args]))
+        if ( ! isset(self::$returnValues[$className][$instanceId][$methodName][$args]))
         {
             // try to finding matching Hamcrest-API Function (anything(), equalTo())
-            $returnValues = self::$returnValues[$className][$methodName][$instanceId];
+            $returnValues = self::$returnValues[$className][$instanceId][$methodName];
             $args = static::checkMatchingArguments($returnValues, $arguments);
 
             if (is_null($args)) {
@@ -300,7 +301,7 @@ class ShortifyPunit
             }
         }
 
-        return self::generateResponse(self::$returnValues[$className][$methodName][$instanceId][$args], $arguments);
+        return self::generateResponse(self::$returnValues[$className][$instanceId][$methodName][$args], $arguments);
     }
 
     /**
@@ -357,11 +358,12 @@ class ShortifyPunit
     /**
      * @param $chainedMethodsBefore
      * @param $mockClassType
+     * @param $mockClassInstanceId
      * @return mixed
      */
-    private static function &getMockHierarchyResponse($chainedMethodsBefore, $mockClassType)
+    private static function &getMockHierarchyResponse($chainedMethodsBefore, $mockClassType, $mockClassInstanceId)
     {
-        $rReturnValues = &self::$returnValues[$mockClassType];
+        $rReturnValues = &self::$returnValues[$mockClassType][$mockClassInstanceId];
         // Check return values chain
         foreach ($chainedMethodsBefore as $chainedMethod) {
             $chainedMethodName = key($chainedMethod);

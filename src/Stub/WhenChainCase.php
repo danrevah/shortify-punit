@@ -61,6 +61,7 @@ class WhenChainCase
         $lastValue = $response;
 
         $mockClassType = get_class($this->mockClass);
+        $mockClassInstanceId = $this->mockClass->getInstanceId();
 
         foreach($methods as $currentMethod)
         {
@@ -70,13 +71,13 @@ class WhenChainCase
             $chainedMethodsBefore = $this->extractChainedMethodsBefore(array_reverse($this->methods), $currentMethod);
 
             // adding to the ShortifyPunit chained method response
-            $this->addChainedMethodResponse($chainedMethodsBefore, $currentMethod, $action, $lastValue);
+            $this->addChainedMethodResponse($chainedMethodsBefore, $currentMethod, $action, $lastValue, $mockClassInstanceId);
 
             $currentMethodName = key($currentMethod);
 
             // closure for MockOnTheFly chained methods
-            $fakeClass->$currentMethodName = function() use ($mockClassType, $chainedMethodsBefore, $currentMethod) {
-                return ShortifyPunit::createChainResponse($mockClassType, $chainedMethodsBefore, $currentMethod, func_get_args());
+            $fakeClass->$currentMethodName = function() use ($mockClassInstanceId, $mockClassType, $chainedMethodsBefore, $currentMethod) {
+                return ShortifyPunit::createChainResponse($mockClassInstanceId, $mockClassType, $chainedMethodsBefore, $currentMethod, func_get_args());
             };
 
             $lastValue = $fakeClass;
@@ -100,8 +101,9 @@ class WhenChainCase
      * @param $currentMethod
      * @param $action
      * @param $lastValue
+     * @param $mockClassInstanceId
      */
-    private function addChainedMethodResponse($chainedMethodsBefore, $currentMethod, $action, $lastValue)
+    private function addChainedMethodResponse($chainedMethodsBefore, $currentMethod, $action, $lastValue, $mockClassInstanceId)
     {
         $response = [];
         $rResponse = &$response;
@@ -120,7 +122,7 @@ class WhenChainCase
 
         $rResponse[$currentMethodName][serialize(current($currentMethod))] = ['response' => ['action' => $action, 'value' => $lastValue]];
 
-        ShortifyPunit::addChainedResponse([get_class($this->mockClass) => $response]);
+        ShortifyPunit::addChainedResponse(array(get_class($this->mockClass) => [$mockClassInstanceId => $response]));
     }
 
     /**
