@@ -167,6 +167,26 @@ class ShortifyPunit
         return new WhenChainCase($mock);
     }
 
+    /**
+     * Verifying method interactions
+     *
+     * Examples:
+     *      ShortifyPunit::when($mock)->first_method()->returns(1);
+     *      echo $mock->first_method(); // method called once
+     *
+     *      ShortifyPunit::verify($mock)->first_method()->neverCalled(); // returns FALSE
+     *      ShortifyPunit::verify($mock)->first_method()->atLeast(2); // returns FALSE
+     *      ShortifyPunit::verify($mock)->first_method()->calledTimes(1); // returns TRUE
+     *
+     *      echo $mock->first_method(); // method has been called twice
+     *
+     *      ShortifyPunit::verify($mock)->first_method()->neverCalled(); // returns FALSE
+     *      ShortifyPunit::verify($mock)->first_method()->atLeast(2); // returns TRUE
+     *      ShortifyPunit::verify($mock)->first_method()->calledTimes(2); // returns TRUE
+     *
+     * @param $mock
+     * @return Verify
+     */
     public static function Verify($mock)
     {
         if ( ! $mock instanceof MockInterface) {

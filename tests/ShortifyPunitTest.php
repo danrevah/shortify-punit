@@ -338,8 +338,6 @@ class ShortifyPunitTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($mock->first_method(1)->second_method(), 4);
         $this->assertEquals($mock->first_method(1)->second_method(1), 5);
         $this->assertEquals($mock->first_method(1)->second_method(2), 6);
-
-
     }
 
     /**
