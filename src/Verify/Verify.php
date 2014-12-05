@@ -12,7 +12,7 @@ class Verify
     use ExceptionFactory, ArgumentMatcher;
 
     /**
-     * @var MockInterface
+     * @var string
      */
     private $mockedClass;
 

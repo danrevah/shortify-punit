@@ -257,6 +257,7 @@ class ShortifyPunit
     {
         $args = serialize($args);
 
+        $returnValues = array();
         $returnValues[$className][$instanceId][$methodName][$args]['response'] = ['action' => $action, 'value' => $returns];
 
         self::_addChainedResponse($returnValues);
