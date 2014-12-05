@@ -319,6 +319,30 @@ class ShortifyPunitTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * Testing multiple mocking results
+     */
+    public function testMultipleMocking()
+    {
+        $mock = ShortifyPunit::mock('SimpleClassForMocking');
+
+        ShortifyPunit::when($mock)->first_method()->returns(1);
+        ShortifyPunit::when($mock)->first_method()->second_method()->returns(2);
+        ShortifyPunit::when($mock)->first_method()->second_method(1)->returns(3);
+        ShortifyPunit::when($mock)->first_method(1)->second_method()->returns(4);
+        ShortifyPunit::when($mock)->first_method(1)->second_method(1)->returns(5);
+        ShortifyPunit::when($mock)->first_method(1)->second_method(2)->returns(6);
+
+        $this->assertInstanceOf('ShortifyPunit\Mock\MockClassOnTheFly', $mock->first_method());
+        $this->assertEquals($mock->first_method()->second_method(), 2);
+        $this->assertEquals($mock->first_method()->second_method(1), 3);
+        $this->assertEquals($mock->first_method(1)->second_method(), 4);
+        $this->assertEquals($mock->first_method(1)->second_method(1), 5);
+        $this->assertEquals($mock->first_method(1)->second_method(2), 6);
+
+
+    }
+
+    /**
      * Testing spies
      */
     public function testSpies()
