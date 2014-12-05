@@ -6,9 +6,9 @@
  * [Mocking](#mocking-examples)
  * [Stubbing](#stubbing)
  * [Spies](#spies)
- * [Stubbing Method Chaning](#stubbing-method-chaining)
+ * [Stubbing Method Chaining](#stubbing-method-chaining)
+ * [Verifying](#verifying)
  * [Argument Matcher](#argument-matcher)
- * [TODO] (#todo)
 
 ## Installation
 
@@ -152,23 +152,3 @@ Some common Hamcrest matchers:
 	* `equalToIgnoringCase` - test string equality ignoring case
 	* `equalToIgnoringWhiteSpace` - test string equality ignoring differences in runs of whitespace
 	* `containsString`, `endsWith`, `startsWith` - test string matching
-
-
-## TODO
-
-1. Add Verify behavior to count calls to functions including globals to verify
-should be based on Mockito verify() function
-https://mockito.googlecode.com/hg-history/1.5/javadoc/org/mockito/Mockito.html
-
-Example usage:
-```php
-    $mock = ShortifyPunit::mock('SimpleClassForMocking');
-
-    ShortifyPunit::when($mock)->first_method()->returns(1);
-    echo $mock->first_method();
-
-    ShortifyPunit::verify($mock)->first_method()->neverCalled(); // returns FALSE
-    ShortifyPunit::verify($mock)->first_method()->atLeast(2); // returns FALSE
-    ShortifyPunit::verify($mock)->first_method()->calledTimes(1); // returns TRUE
-
-```
