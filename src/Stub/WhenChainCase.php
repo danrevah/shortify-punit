@@ -32,7 +32,7 @@ class WhenChainCase
         // add to method list if not an action
         if ( ! in_array($method, array(MockAction::RETURNS, MockAction::THROWS, MockAction::CALLBACK)))
         {
-            array_unshift($this->methods, array($method => $args));
+            array_unshift($this->methods, [$method => $args]);
             return $this;
         }
 
@@ -60,6 +60,14 @@ class WhenChainCase
 
         $lastValue = $response;
 
+        $mockClassType = get_class($this->mockClass);
+
+        if ( ! $this->mockClass instanceof MockInterface) {
+            throw self::generateException('Class is not implementing MockInterface.');
+        }
+
+        $mockClassInstanceId = $this->mockClass->getInstanceId();
+
         foreach($methods as $currentMethod)
         {
             $fakeClass = new MockClassOnTheFly();
@@ -68,13 +76,13 @@ class WhenChainCase
             $chainedMethodsBefore = $this->extractChainedMethodsBefore(array_reverse($this->methods), $currentMethod);
 
             // adding to the ShortifyPunit chained method response
-            $this->addChainedMethodResponse($chainedMethodsBefore, $currentMethod, $action, $lastValue);
+            $this->addChainedMethodResponse($chainedMethodsBefore, $currentMethod, $action, $lastValue, $mockClassInstanceId);
 
             $currentMethodName = key($currentMethod);
 
             // closure for MockOnTheFly chained methods
-            $fakeClass->$currentMethodName = function() use ($chainedMethodsBefore, $currentMethod) {
-                return ShortifyPunit::createChainResponse($chainedMethodsBefore, $currentMethod, func_get_args());
+            $fakeClass->$currentMethodName = function() use ($mockClassInstanceId, $mockClassType, $chainedMethodsBefore, $currentMethod) {
+                return ShortifyPunit::createChainResponse($mockClassInstanceId, $mockClassType, $chainedMethodsBefore, $currentMethod, func_get_args());
             };
 
             $lastValue = $fakeClass;
@@ -83,11 +91,9 @@ class WhenChainCase
             $action = MockAction::RETURNS;
         }
 
-        if ( ! $this->mockClass instanceof MockInterface) {
-            throw self::generateException('Class is not implementing MockInterface.');
-        }
 
-        $whenCase = new WhenCase(get_class($this->mockClass), $this->mockClass->getInstanceId(), key($firstMethod));
+
+        $whenCase = new WhenCase($mockClassType, $this->mockClass->getInstanceId(), key($firstMethod));
         $whenCase->setMethod(current($firstMethod), $action, $lastValue);
     }
 
@@ -98,8 +104,9 @@ class WhenChainCase
      * @param $currentMethod
      * @param $action
      * @param $lastValue
+     * @param $mockClassInstanceId
      */
-    private function addChainedMethodResponse($chainedMethodsBefore, $currentMethod, $action, $lastValue)
+    private function addChainedMethodResponse($chainedMethodsBefore, $currentMethod, $action, $lastValue, $mockClassInstanceId)
     {
         $response = [];
         $rResponse = &$response;
@@ -118,7 +125,7 @@ class WhenChainCase
 
         $rResponse[$currentMethodName][serialize(current($currentMethod))] = ['response' => ['action' => $action, 'value' => $lastValue]];
 
-        ShortifyPunit::addChainedResponse($response);
+        ShortifyPunit::addChainedResponse(array(get_class($this->mockClass) => [$mockClassInstanceId => $response]));
     }
 
     /**

@@ -129,7 +129,7 @@ EOT;
         $class = <<<EOT
   $namespaceDeclaration
   class $mockedObjectName $extends $className $marker {
-   private \$mockInstanceId;
+   public \$mockInstanceId;
 
    public function __construct() {
         \$this->mockInstanceId = {$namespace}\\{$basename}::generateInstanceId();
@@ -148,14 +148,15 @@ EOT;
     /**
      * Creating response by response options (Return/Throw/Callback)
      *
-     * @param $response
+     * @param $mockResponse
      * @param $arguments
      * @return mixed
      */
-    protected static function generateResponse($response, $arguments)
+    protected static function generateResponse(&$mockResponse, $arguments)
     {
-        list($action, $value) = self::extractResponseValues($response);
+        self::updateCallCounter($mockResponse);
 
+        list($action, $value) = self::extractResponseValues($mockResponse);
 
         if ($action == MockAction::THROWS) {
             throw is_object($value) ? $value : new $value;
@@ -169,17 +170,30 @@ EOT;
 
     /**
      * @param $response
+     */
+    public static function updateCallCounter(&$response)
+    {
+        if ( ! array_key_exists('counter', $response)) {
+            $response['counter'] = 0;
+        }
+
+        $response['counter']++;
+    }
+
+    /**
+     * @param $response
      * @return array
      */
     private static function extractResponseValues($response)
     {
-        if (!array_key_exists('action', $response) || !array_key_exists('value', $response)) {
+        if ( ! array_key_exists('action', $response) || !array_key_exists('value', $response)) {
             throw self::generateException('Create chain response corrupt response return values');
         }
 
         $action = $response['action'];
         $value = $response['value'];
+
         return array($action, $value);
-    }
+     }
 
 } 
