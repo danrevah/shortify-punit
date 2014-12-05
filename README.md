@@ -55,7 +55,7 @@ echo $mock->first_method(); // prints 'Foo Bar'
 ShortifyPunit::when($mock)->second_method()->throws(new Exception());
 $mock->second_method(); // throws Exception
 ```
-The `when` function is used to stubbing methods with specific parameters, using throw or return action.
+The `when` function is used to stubbing methods with specific parameters, following a `throws`, `returns` or a `callback` action.
 
 ## Spies
 
@@ -91,11 +91,11 @@ echo $spy->bar(); // prints 'foo'
   echo $mock->first_method(1)->second_method(1); // prints '3'
   echo $mock->first_method(2)->second_method(2)->third_method(); // prints '4'
 ```
-`when` function is also used to stub chained methods, using the same actions as the single function stubbing `return` `throw` or `callback`.
+`when` function is also used to stub chained methods, follows the same actions as the single function stubbing `return`, `throw` or `callback`.
 
 ## Verifying
 
-Once created, mock will remember all invocations. Then you can selectively verify whatever interaction you are inserted in.
+Once created, mock will remember all invocations. Then you can selectively verify some interaction you are inserted in.
 
 ```php
     $mock = ShortifyPunit::mock('SimpleClassForMocking');
