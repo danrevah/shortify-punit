@@ -1,5 +1,5 @@
 #ShortifyPunit &nbsp; [![Build Status](https://travis-ci.org/danrevah/ShortifyPunit.svg?branch=master)](https://travis-ci.org/danrevah/ShortifyPunit)  [![Coverage Status](https://coveralls.io/repos/danrevah/ShortifyPunit/badge.png?branch=master)](https://coveralls.io/repos/danrevah/ShortifyPunit/badge.png?branch=master) ![Code Quality](https://scrutinizer-ci.com/g/danrevah/ShortifyPunit/badges/quality-score.png?b=master)
-> PHP Mocking Framework, **v0.1.5**
+> PHP Mocking Framework, **v0.1.6**
 > inspired by Mockito library for Java
 
  * [Installation](#installation)
@@ -18,8 +18,8 @@ have Composer, you can download it from [http://getcomposer.org/](http://getcomp
  * Run either of the following commands, depending on your environment:
 
 ```
-$ composer global require danrevah/shortifypunit:v0.1.5
-$ php composer.phar global require danrevah/shortifypunit:v0.1.5
+$ composer global require danrevah/shortifypunit:dev-master
+$ php composer.phar global require danrevah/shortifypunit:dev-master
 ```
 
 ## Mocking Examples
