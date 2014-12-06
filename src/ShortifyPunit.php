@@ -187,7 +187,7 @@ class ShortifyPunit
      * @param $mock
      * @return Verify
      */
-    public static function Verify($mock)
+    public static function verify($mock)
     {
         if ( ! $mock instanceof MockInterface) {
             throw self::generateException('verify() must get a mocked instance as parameter');
