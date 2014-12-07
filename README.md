@@ -57,6 +57,11 @@ $mock->second_method(); // throws Exception
 ```
 The `when` function is used to stubbing methods with specific parameters, following a `throws`, `returns` or a `callback` action.
 
+Methods:
+* `throws($exception)` - Throws an exception
+* `returns($response)` - Returns a $response
+* `callback(function() { /*...*/ })` - Calling a callback
+
 ## Spies
 
 Spies are a partial mock, sometimes you need some of the methods to behave normally except for the one method that you need to test. That so called partial mocking can be done using the spy method
@@ -113,6 +118,13 @@ Once created, mock will remember all invocations. Then you can selectively verif
     ShortifyPunit::verify($mock)->first_method()->atLeast(2); // returns TRUE
     ShortifyPunit::verify($mock)->first_method()->calledTimes(2); // returns TRUE
 ```
+
+Methods:
+* `atLeast($times)` - Verify called at least $times
+* `atLeastOnce()` - Alias of atLeast(1)
+* `calledTimes($times)` - Verify called exactly $times
+* `neverCalled()` - Alias of calledTimes(0)
+* `lessThan($times)` - Verify called less than $times
 
 ## Argument Matcher
 
