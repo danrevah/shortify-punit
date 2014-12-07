@@ -13,8 +13,8 @@ class VerifyTest extends \PHPUnit_Framework_TestCase
         $mock = ShortifyPunit::mock('Foo');
         ShortifyPunit::when($mock)->bar()->foo()->returns(1);
 
-        $this->assertTrue(ShortifyPunit::Verify($mock)->blabla()->calledTimes(0)); // missing function
-        $this->assertTrue(ShortifyPunit::Verify($mock)->bar(1)->calledTimes(0)); // this function with that parameter hasn't been stubbed
+        $this->assertTrue(ShortifyPunit::verify($mock)->blabla()->calledTimes(0)); // missing function
+        $this->assertTrue(ShortifyPunit::verify($mock)->bar(1)->calledTimes(0)); // this function with that parameter hasn't been stubbed
     }
 
     /**
@@ -38,13 +38,13 @@ class VerifyTest extends \PHPUnit_Framework_TestCase
 
         $mock->bar()->foo();
 
-        $this->assertTrue(ShortifyPunit::Verify($mock)->bar()->foo()->atLeast(1));
-        $this->assertTrue(ShortifyPunit::Verify($mock)->bar()->foo()->calledTimes(1));
-        $this->assertTrue(ShortifyPunit::Verify($mock)->bar()->foo()->lessThan(2));
+        $this->assertTrue(ShortifyPunit::verify($mock)->bar()->foo()->atLeast(1));
+        $this->assertTrue(ShortifyPunit::verify($mock)->bar()->foo()->calledTimes(1));
+        $this->assertTrue(ShortifyPunit::verify($mock)->bar()->foo()->lessThan(2));
 
-        $this->assertFalse(ShortifyPunit::Verify($mock)->bar()->foo()->lessThan(1));
-        $this->assertFalse(ShortifyPunit::Verify($mock)->bar()->foo()->calledTimes(2));
-        $this->assertFalse(ShortifyPunit::Verify($mock)->bar()->foo()->atLeast(2));
+        $this->assertFalse(ShortifyPunit::verify($mock)->bar()->foo()->lessThan(1));
+        $this->assertFalse(ShortifyPunit::verify($mock)->bar()->foo()->calledTimes(2));
+        $this->assertFalse(ShortifyPunit::verify($mock)->bar()->foo()->atLeast(2));
     }
 
     /**
@@ -58,22 +58,22 @@ class VerifyTest extends \PHPUnit_Framework_TestCase
 
         $mock->bar();
 
-        $this->assertTrue(ShortifyPunit::Verify($mock)->bar()->atLeast(1));
-        $this->assertTrue(ShortifyPunit::Verify($mock)->bar()->calledTimes(1));
-        $this->assertTrue(ShortifyPunit::Verify($mock)->bar()->lessThan(2));
+        $this->assertTrue(ShortifyPunit::verify($mock)->bar()->atLeast(1));
+        $this->assertTrue(ShortifyPunit::verify($mock)->bar()->calledTimes(1));
+        $this->assertTrue(ShortifyPunit::verify($mock)->bar()->lessThan(2));
 
         $mock->bar();
 
-        $this->assertTrue(ShortifyPunit::Verify($mock)->bar()->atLeast(2));
-        $this->assertTrue(ShortifyPunit::Verify($mock)->bar()->calledTimes(2));
-        $this->assertTrue(ShortifyPunit::Verify($mock)->bar()->lessThan(3));
+        $this->assertTrue(ShortifyPunit::verify($mock)->bar()->atLeast(2));
+        $this->assertTrue(ShortifyPunit::verify($mock)->bar()->calledTimes(2));
+        $this->assertTrue(ShortifyPunit::verify($mock)->bar()->lessThan(3));
 
         ShortifyPunit::when($mock)->bar(1)->returns(2);
 
-        $this->assertTrue(ShortifyPunit::Verify($mock)->bar(1)->neverCalled());
-        $this->assertTrue(ShortifyPunit::Verify($mock)->bar(1)->atLeast(0));
-        $this->assertTrue(ShortifyPunit::Verify($mock)->bar(1)->calledTimes(0));
-        $this->assertTrue(ShortifyPunit::Verify($mock)->bar(1)->lessThan(1));
+        $this->assertTrue(ShortifyPunit::verify($mock)->bar(1)->neverCalled());
+        $this->assertTrue(ShortifyPunit::verify($mock)->bar(1)->atLeast(0));
+        $this->assertTrue(ShortifyPunit::verify($mock)->bar(1)->calledTimes(0));
+        $this->assertTrue(ShortifyPunit::verify($mock)->bar(1)->lessThan(1));
 
         $mock->bar(1);
 
@@ -91,25 +91,27 @@ class VerifyTest extends \PHPUnit_Framework_TestCase
 
         ShortifyPunit::when($mock)->bar(1)->foo(2)->returns(10);
 
-        $this->assertTrue(ShortifyPunit::Verify($mock)->bar(1)->foo(2)->neverCalled());
-        $this->assertTrue(ShortifyPunit::Verify($mock)->bar(1)->foo(2)->atLeast(0));
-        $this->assertTrue(ShortifyPunit::Verify($mock)->bar(1)->foo(2)->calledTimes(0));
-        $this->assertTrue(ShortifyPunit::Verify($mock)->bar(1)->foo(2)->lessThan(1));
+        $this->assertTrue(ShortifyPunit::verify($mock)->bar(1)->foo(2)->neverCalled());
+        $this->assertTrue(ShortifyPunit::verify($mock)->bar(1)->foo(2)->atLeast(0));
+        $this->assertTrue(ShortifyPunit::verify($mock)->bar(1)->foo(2)->calledTimes(0));
+        $this->assertTrue(ShortifyPunit::verify($mock)->bar(1)->foo(2)->lessThan(1));
 
-        $this->assertFalse(ShortifyPunit::Verify($mock)->bar(1)->foo(2)->atLeast(1));
-        $this->assertFalse(ShortifyPunit::Verify($mock)->bar(1)->foo(2)->calledTimes(1));
-        $this->assertFalse(ShortifyPunit::Verify($mock)->bar(1)->foo(2)->lessThan(0));
+        $this->assertFalse(ShortifyPunit::verify($mock)->bar(1)->foo(2)->atLeast(1));
+        $this->assertFalse(ShortifyPunit::verify($mock)->bar(1)->foo(2)->atLeastOnce());
+        $this->assertFalse(ShortifyPunit::verify($mock)->bar(1)->foo(2)->calledTimes(1));
+        $this->assertFalse(ShortifyPunit::verify($mock)->bar(1)->foo(2)->lessThan(0));
 
         $mock->bar(1)->foo(2);
 
-        $this->assertFalse(ShortifyPunit::Verify($mock)->bar(1)->foo(2)->neverCalled());
-        $this->assertTrue(ShortifyPunit::Verify($mock)->bar(1)->foo(2)->atLeast(1));
-        $this->assertTrue(ShortifyPunit::Verify($mock)->bar(1)->foo(2)->calledTimes(1));
-        $this->assertTrue(ShortifyPunit::Verify($mock)->bar(1)->foo(2)->lessThan(2));
+        $this->assertFalse(ShortifyPunit::verify($mock)->bar(1)->foo(2)->neverCalled());
+        $this->assertTrue(ShortifyPunit::verify($mock)->bar(1)->foo(2)->atLeast(1));
+        $this->assertTrue(ShortifyPunit::verify($mock)->bar(1)->foo(2)->atLeastOnce());
+        $this->assertTrue(ShortifyPunit::verify($mock)->bar(1)->foo(2)->calledTimes(1));
+        $this->assertTrue(ShortifyPunit::verify($mock)->bar(1)->foo(2)->lessThan(2));
 
-        $this->assertFalse(ShortifyPunit::Verify($mock)->bar(1)->foo(2)->atLeast(2));
-        $this->assertFalse(ShortifyPunit::Verify($mock)->bar(1)->foo(2)->calledTimes(2));
-        $this->assertFalse(ShortifyPunit::Verify($mock)->bar(1)->foo(2)->lessThan(1));
+        $this->assertFalse(ShortifyPunit::verify($mock)->bar(1)->foo(2)->atLeast(2));
+        $this->assertFalse(ShortifyPunit::verify($mock)->bar(1)->foo(2)->calledTimes(2));
+        $this->assertFalse(ShortifyPunit::verify($mock)->bar(1)->foo(2)->lessThan(1));
     }
 
     /**
@@ -121,20 +123,22 @@ class VerifyTest extends \PHPUnit_Framework_TestCase
 
         ShortifyPunit::when($mock)->bar(equalTo(1))->foo(anything())->returns(10);
 
-        $this->assertTrue(ShortifyPunit::Verify($mock)->bar(1)->foo(2)->neverCalled());
-        $this->assertTrue(ShortifyPunit::Verify($mock)->bar(1)->foo(2)->atLeast(0));
-        $this->assertTrue(ShortifyPunit::Verify($mock)->bar(1)->foo(2)->calledTimes(0));
-        $this->assertTrue(ShortifyPunit::Verify($mock)->bar(1)->foo(2)->lessThan(1));
+        $this->assertTrue(ShortifyPunit::verify($mock)->bar(1)->foo(2)->neverCalled());
+        $this->assertTrue(ShortifyPunit::verify($mock)->bar(1)->foo(2)->atLeast(0));
+        $this->assertTrue(ShortifyPunit::verify($mock)->bar(1)->foo(2)->calledTimes(0));
+        $this->assertTrue(ShortifyPunit::verify($mock)->bar(1)->foo(2)->lessThan(1));
+        $this->assertFalse(ShortifyPunit::verify($mock)->bar(1)->foo(2)->atLeastOnce());
 
         $mock->bar(1)->foo(2);
 
-        $this->assertFalse(ShortifyPunit::Verify($mock)->bar(1)->foo(2)->neverCalled());
-        $this->assertTrue(ShortifyPunit::Verify($mock)->bar(1)->foo(2)->atLeast(1));
-        $this->assertTrue(ShortifyPunit::Verify($mock)->bar(1)->foo(2)->calledTimes(1));
-        $this->assertTrue(ShortifyPunit::Verify($mock)->bar(1)->foo(2)->lessThan(2));
+        $this->assertFalse(ShortifyPunit::verify($mock)->bar(1)->foo(2)->neverCalled());
+        $this->assertTrue(ShortifyPunit::verify($mock)->bar(1)->foo(2)->atLeast(1));
+        $this->assertTrue(ShortifyPunit::verify($mock)->bar(1)->foo(2)->atLeastOnce());
+        $this->assertTrue(ShortifyPunit::verify($mock)->bar(1)->foo(2)->calledTimes(1));
+        $this->assertTrue(ShortifyPunit::verify($mock)->bar(1)->foo(2)->lessThan(2));
 
-        $this->assertFalse(ShortifyPunit::Verify($mock)->bar(1)->foo(2)->atLeast(2));
-        $this->assertFalse(ShortifyPunit::Verify($mock)->bar(1)->foo(2)->calledTimes(2));
-        $this->assertFalse(ShortifyPunit::Verify($mock)->bar(1)->foo(2)->lessThan(1));
+        $this->assertFalse(ShortifyPunit::verify($mock)->bar(1)->foo(2)->atLeast(2));
+        $this->assertFalse(ShortifyPunit::verify($mock)->bar(1)->foo(2)->calledTimes(2));
+        $this->assertFalse(ShortifyPunit::verify($mock)->bar(1)->foo(2)->lessThan(1));
     }
 } 

@@ -50,18 +50,6 @@ class Verify
     }
 
     /**
-     * Validating if chained stubbing has been never called
-     *
-     * @return bool
-     */
-    public function neverCalled()
-    {
-        $counter = self::getChainedMockCounter($this->methods);
-
-        return ($counter == 0);
-    }
-
-    /**
      * Validating if chained stubbing has been called
      * at least $count times
      *
@@ -73,6 +61,16 @@ class Verify
         $counter = self::getChainedMockCounter($this->methods);
 
         return ($counter >= $count);
+    }
+
+    /**
+     * Alias for atLeast(1)
+     *
+     * @return bool
+     */
+    public function atLeastOnce()
+    {
+        return $this->atLeast(1);
     }
 
     /**
@@ -101,6 +99,16 @@ class Verify
         $counter = self::getChainedMockCounter($this->methods);
 
         return ($counter == $count);
+    }
+
+    /**
+     * Alias for calledTimes(0)
+     *
+     * @return bool
+     */
+    public function neverCalled()
+    {
+        return $this->calledTimes(0);
     }
 
     /**
