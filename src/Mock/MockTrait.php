@@ -70,10 +70,10 @@ trait MockTrait
                 $class .= <<<EOT
                 public function $returnsByReference $methodName ({$methodParams}) {
                     \$args = func_get_args();
-                    \$methodStubbed = {$namespace}\\{$basename}::isMethodStubbed('{$mockedObjectName}', \$this->mockInstanceId, '{$methodName}');
+                    \$methodStubbed = {$namespace}\\{$basename}::isMethodStubbed('{$mockedObjectName}', \$this->shortifyPunitInstanceId, '{$methodName}');
 
                     if (\$methodStubbed) {
-                        return {$namespace}\\{$basename}::createResponse('{$mockedObjectName}', \$this->mockInstanceId, '{$methodName}', \$args);
+                        return {$namespace}\\{$basename}::createResponse('{$mockedObjectName}', \$this->shortifyPunitInstanceId, '{$methodName}', \$args);
                     } else {
                         return call_user_func_array(array('parent', __FUNCTION__), \$args);
                     }
@@ -84,7 +84,7 @@ EOT;
             {
                 $class .= <<<EOT
                 public function $returnsByReference $methodName ({$methodParams}) {
-                    return {$namespace}\\{$basename}::createResponse('{$mockedObjectName}', \$this->mockInstanceId, '{$methodName}', func_get_args());
+                    return {$namespace}\\{$basename}::createResponse('{$mockedObjectName}', \$this->shortifyPunitInstanceId, '{$methodName}', func_get_args());
                 }
 EOT;
             }
@@ -129,13 +129,13 @@ EOT;
         $class = <<<EOT
   $namespaceDeclaration
   class $mockedObjectName $extends $className $marker {
-   public \$mockInstanceId;
+   public \$shortifyPunitInstanceId;
 
    public function __construct() {
-        \$this->mockInstanceId = {$namespace}\\{$basename}::generateInstanceId();
+        \$this->shortifyPunitInstanceId = {$namespace}\\{$basename}::generateInstanceId();
    }
 
-   public function getInstanceId() { return \$this->mockInstanceId; }
+   public function getShortifyPunitInstanceId() { return \$this->shortifyPunitInstanceId; }
 EOT;
         $class = self::mockClassMethods($methods, $namespace, $basename, $mockedObjectName, $class, $mockType);
         $class .= '}';

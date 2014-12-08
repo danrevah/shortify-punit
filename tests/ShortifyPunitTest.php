@@ -182,13 +182,13 @@ class ShortifyPunitTest extends \PHPUnit_Framework_TestCase
     public function testInstanceIdOfMocks()
     {
         $mock = ShortifyPunit::mock('SimpleClassForMocking');
-        $instanceId = $mock->getInstanceId();
+        $instanceId = $mock->getShortifyPunitInstanceId();
 
         $mockTwo = ShortifyPunit::mock('SimpleClassForMocking');
         $mockThree = ShortifyPunit::mock('SimpleClassForMocking');
 
-        $this->assertEquals($instanceId+1, $mockTwo->getInstanceId());
-        $this->assertEquals($instanceId+2, $mockThree->getInstanceId());
+        $this->assertEquals($instanceId+1, $mockTwo->getShortifyPunitInstanceId());
+        $this->assertEquals($instanceId+2, $mockThree->getShortifyPunitInstanceId());
     }
 
     /**
@@ -263,7 +263,7 @@ class ShortifyPunitTest extends \PHPUnit_Framework_TestCase
 
         ShortifyPunit::when($mock)->first_method()->second_method(2,3)->returns(1);
         $response = ShortifyPunit::getReturnValues();
-        $response[get_class($mock)][$mock->getInstanceId()]['first_method']['a:0:{}']['second_method']['a:2:{i:0;i:2;i:1;i:3;}'] = ['response' => []];
+        $response[get_class($mock)][$mock->getShortifyPunitInstanceId()]['first_method']['a:0:{}']['second_method']['a:2:{i:0;i:2;i:1;i:3;}'] = ['response' => []];
         ShortifyPunit::setReturnValues($response);
         $mock->first_method()->second_method(2,3);
     }

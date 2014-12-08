@@ -32,7 +32,7 @@ class Verify
     public function __construct($class)
     {
         $this->mockedClass = get_class($class);
-        $this->instanceId = $class->getInstanceId();
+        $this->instanceId = $class->getShortifyPunitInstanceId();
     }
 
     /**

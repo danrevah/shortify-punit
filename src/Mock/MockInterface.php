@@ -11,5 +11,5 @@ interface MockInterface
     /**
      * @return integer
      */
-    public function getInstanceId();
+    public function getShortifyPunitInstanceId();
 }

@@ -66,7 +66,7 @@ class WhenChainCase
             throw self::generateException('Class is not implementing MockInterface.');
         }
 
-        $mockClassInstanceId = $this->mockClass->getInstanceId();
+        $mockClassInstanceId = $this->mockClass->getShortifyPunitInstanceId();
 
         foreach($methods as $currentMethod)
         {
@@ -93,7 +93,7 @@ class WhenChainCase
 
 
 
-        $whenCase = new WhenCase($mockClassType, $this->mockClass->getInstanceId(), key($firstMethod));
+        $whenCase = new WhenCase($mockClassType, $this->mockClass->getShortifyPunitInstanceId(), key($firstMethod));
         $whenCase->setMethod(current($firstMethod), $action, $lastValue);
     }
 
