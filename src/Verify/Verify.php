@@ -2,8 +2,8 @@
 namespace ShortifyPunit\Verify;
 
 
-use ShortifyPunit\ArgumentMatcher;
 use ShortifyPunit\Exceptions\ExceptionFactory;
+use ShortifyPunit\Matcher\ArgumentMatcher;
 use ShortifyPunit\Mock\MockInterface;
 use ShortifyPunit\ShortifyPunit;
 
