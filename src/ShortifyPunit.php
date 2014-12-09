@@ -319,13 +319,9 @@ class ShortifyPunit
             // try to finding matching Hamcrest-API Function (anything(), equalTo())
             $returnValues = self::$returnValues[$className][$instanceId][$methodName];
             $args = static::checkMatchingArguments($returnValues, $arguments);
-
-            if (is_null($args)) {
-                return NULL;
-            }
         }
 
-        return self::generateResponse(self::$returnValues[$className][$instanceId][$methodName][$args]['response'], $arguments);
+        return is_null($args) ? NULL : self::generateResponse(self::$returnValues[$className][$instanceId][$methodName][$args]['response'], $arguments);
     }
 
     /**
