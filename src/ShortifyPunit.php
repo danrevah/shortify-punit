@@ -1,12 +1,8 @@
 <?php
 namespace ShortifyPunit;
 
-use ShortifyPunit\Enums\MockTypes;
 use ShortifyPunit\Matcher\ArgumentMatcher;
-use ShortifyPunit\Mock\MockInterface;
 use ShortifyPunit\Mock\MockTrait;
-use ShortifyPunit\Stub\WhenChainCase;
-use ShortifyPunit\Verify\Verify;
 
 /**
  * Class ShortifyPunit
