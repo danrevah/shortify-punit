@@ -19,24 +19,12 @@ use ShortifyPunit\Verify\Verify;
  * @method static setWhenMockResponse($className, $instanceId, $methodName, $args, $action, $returns)
  * @method static generateInstanceId()
  */
-class ShortifyPunit
+class ShortifyPunit extends ShortifyPunitBase
 {
-    use ArgumentMatcher, MockTrait;
-
     /**
      * @var int - Last mock instance id (Counter)
      */
     private static $instanceId = 0;
-
-    /**
-     * @var string - Mocked classes base prefix
-     */
-    private static $classBasePrefix = 'ShortifyPunit';
-
-    /**
-     * @var string - Current namespace
-     */
-    private static $namespace = 'ShortifyPunit';
 
     /**
      * @var array - return values of mocked functions by instance id
@@ -79,7 +67,7 @@ class ShortifyPunit
 
         $backTrace = debug_backtrace();
         $callingClassName = $backTrace[2]['class'];
-        $namespace = self::$namespace;
+        $namespace = static::$namespace;
 
 
         if ( ! self::isFriendClass($callingClassName, $namespace)){
@@ -89,113 +77,6 @@ class ShortifyPunit
         return forward_static_call_array('static::'.$name, $arguments);
     }
 
-    /**
-     * Mocking interfaces & classes
-     *
-     * @desc Ignoring final and private methods
-     *
-     * Examples:
-     *      // Creating a new mock for SimpleClassForMocking
-     *      $mock = ShortifyPunit::mock('SimpleClassForMocking');
-     *
-     *      // Returns NULL, was not stubbed yet
-     *      $mock->first_method();
-     *
-     * @param $mockedClass
-     * @return mixed
-     */
-    public static function mock($mockedClass)
-    {
-        $reflection = self::getMockReflection($mockedClass);
-
-        return static::mockClass($reflection, self::$namespace, self::$classBasePrefix);
-    }
-
-    /**
-     * Partial Mocking interfaces|classes
-     *
-     * @desc Partial mock is not stubbing any function by default (to NULL) like in regular mock()
-     *
-     * Examples:
-     *      // class to partial mock / spy
-     *      class Foo {
-     *        function bar() { return 'bar'; }
-     *      }
-     *
-     *      $mock = ShortifyPunit::mock('Foo');
-     *      $spy = ShortifyPunit::spy('Foo');
-     *
-     *      $mock->bar(); // returns NULL
-     *      echo $spy->bar(); // prints 'bar'
-     *
-     *      ShortifyPunit::when($spy)->bar()->returns('foo'); // stubbing spy
-     *      echo $spy->bar(); // prints 'foo'
-     *
-     * @param $mockedClass
-     * @return mixed
-     */
-    public static function spy($mockedClass)
-    {
-        $reflection = self::getMockReflection($mockedClass);
-
-        return static::mockClass($reflection, self::$namespace, self::$classBasePrefix, MockTypes::PARTIAL);
-    }
-
-    /**
-     * Setting up a when case
-     *
-     * Examples:
-     *      // Chain Stubbing
-     *      ShortifyPunit::when($mock)->first_method()->second_method(1)->returns(1);
-     *      ShortifyPunit::when($mock)->first_method()->second_method(2)->returns(2);
-     *      ShortifyPunit::when($mock)->first_method(1)->second_method(1)->returns(3);
-     *      ShortifyPunit::when($mock)->first_method(2)->second_method(2)->third_method()->returns(4);
-     *
-     *      echo $mock->first_method()->second_method(1); // prints '1'
-     *      echo $mock->first_method()->second_method(2); // prints '2'
-     *      echo $mock->first_method(1)->second_method(1); // prints '3'
-     *      echo $mock->first_method(2)->second_method(2)->third_method(); // prints '4'
-     *
-     * @param MockInterface $mock
-     * @return WhenChainCase
-     */
-    public static function when($mock)
-    {
-        if ( ! $mock instanceof MockInterface) {
-            throw self::generateException('when() must get a mocked instance as parameter');
-        }
-
-        return new WhenChainCase($mock);
-    }
-
-    /**
-     * Verifying method interactions
-     *
-     * Examples:
-     *      ShortifyPunit::when($mock)->first_method()->returns(1);
-     *      echo $mock->first_method(); // method called once
-     *
-     *      ShortifyPunit::verify($mock)->first_method()->neverCalled(); // returns FALSE
-     *      ShortifyPunit::verify($mock)->first_method()->atLeast(2); // returns FALSE
-     *      ShortifyPunit::verify($mock)->first_method()->calledTimes(1); // returns TRUE
-     *
-     *      echo $mock->first_method(); // method has been called twice
-     *
-     *      ShortifyPunit::verify($mock)->first_method()->neverCalled(); // returns FALSE
-     *      ShortifyPunit::verify($mock)->first_method()->atLeast(2); // returns TRUE
-     *      ShortifyPunit::verify($mock)->first_method()->calledTimes(2); // returns TRUE
-     *
-     * @param $mock
-     * @return Verify
-     */
-    public static function verify($mock)
-    {
-        if ( ! $mock instanceof MockInterface) {
-            throw self::generateException('verify() must get a mocked instance as parameter');
-        }
-
-        return new Verify($mock);
-    }
 
     /**
      * @return array
@@ -225,10 +106,10 @@ class ShortifyPunit
     {
         // check if instance of this method even exist
         if ( ! isset(self::$returnValues[$className][$instanceId][$methodName])) {
-            return FALSE;
+            return false;
         }
 
-        return TRUE;
+        return true;
     }
 
     /**
@@ -255,7 +136,7 @@ class ShortifyPunit
             $serializedArgs = static::checkMatchingArguments($rReturnValues[$currentMethodName], $args);
 
             if (is_null($serializedArgs)) {
-                return NULL;
+                return null;
             }
         }
 
@@ -310,7 +191,7 @@ class ShortifyPunit
 
         // check if instance of this method even exist
         if ( ! isset(self::$returnValues[$className][$instanceId][$methodName])) {
-            return NULL;
+            return null;
         }
 
         // Check if doesn't exist as-is in return values array
@@ -321,7 +202,7 @@ class ShortifyPunit
             $args = static::checkMatchingArguments($returnValues, $arguments);
         }
 
-        return is_null($args) ? NULL : self::generateResponse(self::$returnValues[$className][$instanceId][$methodName][$args]['response'], $arguments);
+        return is_null($args) ? null : self::generateResponse(self::$returnValues[$className][$instanceId][$methodName][$args]['response'], $arguments);
     }
 
     /**
@@ -338,24 +219,6 @@ class ShortifyPunit
         } else {
             self::$returnValues[$firstChainedMethodName] = $response[$firstChainedMethodName];
         }
-    }
-
-    /**
-     * @param $mockedClass
-     * @return \ReflectionClass
-     */
-    private static function getMockReflection($mockedClass)
-    {
-        if (!class_exists($mockedClass) and !interface_exists($mockedClass)) {
-            throw self::generateException("Mocking failed `{$mockedClass}` No such class or interface");
-        }
-
-        $reflection = new \ReflectionClass($mockedClass);
-
-        if ($reflection->isFinal()) {
-            throw self::generateException("Unable to mock class {$mockedClass} declared as final");
-        }
-        return $reflection;
     }
 
     /**
