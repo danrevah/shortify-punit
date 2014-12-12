@@ -3,44 +3,6 @@ use ShortifyPunit\Enums\MockAction;
 use ShortifyPunit\ShortifyPunit;
 use ShortifyPunit\Mock\MockInterface;
 
-/**
- * Class SimpleClassForMocking
- */
-class SimpleClassForMocking
-{
-    public function first_method() {
-        return 1;
-    }
-
-    public function second_method() {
-        return 2;
-    }
-
-    public function third_method() {
-        return 3;
-    }
-
-    public function fourth_method() {
-        return 4;
-    }
-
-    public function params(array $arr, SimpleClassForMocking $instance, $code = 1)
-    {
-
-    }
-}
-
-/**
- * Class FinalClassForMocking
- */
-final class FinalClassForMocking
-{
-}
-
-interface InterfaceTest
-{
-
-}
 
 class ShortifyPunitTest extends \PHPUnit_Framework_TestCase
 {
