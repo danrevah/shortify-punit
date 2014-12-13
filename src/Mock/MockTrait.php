@@ -1,6 +1,7 @@
 <?php
 namespace ShortifyPunit\Mock;
 
+use Reflection;
 use ShortifyPunit\Enums\MockAction;
 use ShortifyPunit\Enums\MockTypes;
 use ShortifyPunit\Exceptions\ExceptionFactory;
@@ -64,11 +65,12 @@ trait MockTrait
 
             $methodParams = implode(',', $methodParams);
 
+            $modifierNames = implode(' ', Reflection::getModifierNames($method->getModifiers()));
 
             if ($mockType == MockTypes::PARTIAL)
             {
                 $class .= <<<EOT
-                public function $returnsByReference $methodName ({$methodParams}) {
+                $modifierNames function $returnsByReference $methodName ({$methodParams}) {
                     \$args = func_get_args();
                     \$methodStubbed = {$namespace}\\{$basename}::isMethodStubbed('{$mockedObjectName}', \$this->shortifyPunitInstanceId, '{$methodName}');
 
@@ -83,7 +85,7 @@ EOT;
             else
             {
                 $class .= <<<EOT
-                public function $returnsByReference $methodName ({$methodParams}) {
+                $modifierNames function $returnsByReference $methodName ({$methodParams}) {
                     return {$namespace}\\{$basename}::createResponse('{$mockedObjectName}', \$this->shortifyPunitInstanceId, '{$methodName}', func_get_args());
                 }
 EOT;
