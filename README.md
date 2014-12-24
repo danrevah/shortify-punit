@@ -20,8 +20,8 @@ have Composer, you can download it from [http://getcomposer.org/](http://getcomp
  * Run either of the following commands, depending on your environment:
 
 ```
-$ composer global require danrevah/shortifypunit:dev-master
-$ php composer.phar global require danrevah/shortifypunit:dev-master
+$ composer require danrevah/shortifypunit:dev-master
+$ php composer.phar require danrevah/shortifypunit:dev-master
 ```
 
 ## Mocking Examples
