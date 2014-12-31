@@ -77,10 +77,14 @@ class ShortifyPunit
             throw self::generateException("{$class} has no such method!");
         }
 
+        $namespace = self::$namespace;
         $backTrace = debug_backtrace();
         $callingClassName = $backTrace[2]['class'];
-        $namespace = self::$namespace;
-
+        
+        $reflection = new \ReflectionClass($callingClassName);
+        if ($reflection->implementsInterface("{$namespace}\\Mock\\MockInterface") && is_array($arguments)) {
+            $arguments[0] = $callingClassName;
+        }
 
         if ( ! self::isFriendClass($callingClassName, $namespace)){
             throw self::generateException("{$class} is not a friend class!");
