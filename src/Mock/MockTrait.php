@@ -107,7 +107,7 @@ EOT;
     {
         $mockedObjectName = $reflection->getShortName().($mockType == MockTypes::PARTIAL ? 'PARTIAL' : 'MOCK');
 
-        $className = $reflection->getName();
+        $className = $reflection->getShortName();
         $methods = $reflection->getMethods();
 
         if ($reflection->isInterface()) {
@@ -142,9 +142,11 @@ EOT;
         $class = self::mockClassMethods($methods, $namespace, $basename, $mockedObjectName, $class, $mockType);
         $class .= '}';
 
+
         eval($class);
 
-        return new $mockedObjectName();
+        $className = empty($mockedNamespace) ? $mockedObjectName : "\\{$mockedNamespace}\\{$mockedObjectName}";
+        return new $className();
     }
 
     /**
