@@ -30,8 +30,12 @@ class WhenChainCase
     public function __call($method, $args)
     {
         // add to method list if not an action
-        if ( ! in_array($method, array(MockAction::RETURNS, MockAction::THROWS, MockAction::CALLBACK)))
-        {
+        if ( ! in_array($method, array(
+                MockAction::RETURNS,
+                MockAction::THROWS,
+                MockAction::CALLBACK
+            ))
+        ) {
             array_unshift($this->methods, [$method => $args]);
             return $this;
         }
@@ -73,16 +77,36 @@ class WhenChainCase
             $fakeClass = new MockClassOnTheFly();
 
             // extracting methods before the current method into an array
-            $chainedMethodsBefore = $this->extractChainedMethodsBefore(array_reverse($this->methods), $currentMethod);
+            $chainedMethodsBefore = $this->extractChainedMethodsBefore(
+                array_reverse($this->methods),
+                $currentMethod
+            );
 
             // adding to the ShortifyPunit chained method response
-            $this->addChainedMethodResponse($chainedMethodsBefore, $currentMethod, $action, $lastValue, $mockClassInstanceId);
+            $this->addChainedMethodResponse(
+                $chainedMethodsBefore,
+                $currentMethod,
+                $action,
+                $lastValue,
+                $mockClassInstanceId
+            );
 
             $currentMethodName = key($currentMethod);
 
             // closure for MockOnTheFly chained methods
-            $fakeClass->$currentMethodName = function() use ($mockClassInstanceId, $mockClassType, $chainedMethodsBefore, $currentMethod) {
-                return ShortifyPunit::createChainResponse($mockClassInstanceId, $mockClassType, $chainedMethodsBefore, $currentMethod, func_get_args());
+            $fakeClass->$currentMethodName = function() use (
+                $mockClassInstanceId,
+                $mockClassType,
+                $chainedMethodsBefore,
+                $currentMethod
+            ) {
+                return ShortifyPunit::createChainResponse(
+                    $mockClassInstanceId,
+                    $mockClassType,
+                    $chainedMethodsBefore,
+                    $currentMethod,
+                    func_get_args()
+                );
             };
 
             $lastValue = $fakeClass;
