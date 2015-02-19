@@ -18,8 +18,14 @@ trait MockTrait
      * @param string $mockType
      * @return string
      */
-    protected static function mockClassMethods($methods, $namespace, $basename, $mockedObjectName, $class, $mockType)
-    {
+    protected static function mockClassMethods(
+        $methods,
+        $namespace,
+        $basename,
+        $mockedObjectName,
+        $class,
+        $mockType
+    ) {
         /* Mocking methods */
         foreach ($methods as $method)
         {
@@ -72,10 +78,19 @@ trait MockTrait
                 $class .= <<<EOT
                 $modifierNames function $returnsByReference $methodName ({$methodParams}) {
                     \$args = func_get_args();
-                    \$methodStubbed = {$namespace}\\{$basename}::isMethodStubbed('{$mockedObjectName}', \$this->shortifyPunitInstanceId, '{$methodName}');
+                    \$methodStubbed = {$namespace}\\{$basename}::isMethodStubbed(
+                        '{$mockedObjectName}',
+                        \$this->shortifyPunitInstanceId,
+                        '{$methodName}'
+                    );
 
                     if (\$methodStubbed) {
-                        return {$namespace}\\{$basename}::createResponse('{$mockedObjectName}', \$this->shortifyPunitInstanceId, '{$methodName}', \$args);
+                        return {$namespace}\\{$basename}::createResponse(
+                            '{$mockedObjectName}',
+                            \$this->shortifyPunitInstanceId,
+                            '{$methodName}',
+                            \$args
+                        );
                     } else {
                         return call_user_func_array(array('parent', __FUNCTION__), \$args);
                     }
@@ -86,7 +101,12 @@ EOT;
             {
                 $class .= <<<EOT
                 $modifierNames function $returnsByReference $methodName ({$methodParams}) {
-                    return {$namespace}\\{$basename}::createResponse('{$mockedObjectName}', \$this->shortifyPunitInstanceId, '{$methodName}', func_get_args());
+                    return {$namespace}\\{$basename}::createResponse(
+                        '{$mockedObjectName}',
+                        \$this->shortifyPunitInstanceId,
+                        '{$methodName}',
+                        func_get_args()
+                    );
                 }
 EOT;
             }

@@ -42,10 +42,17 @@ class ShortifyPunit
      * @var array - return values of mocked functions by instance id
      *
      * Nesting:
-     *   - Single Stub: [className][instanceId][methodName][args] = array('action' => ..., 'value' => ...)
+     *   - Single Stub: [className][instanceId][methodName][args] = array(
+     *      'action' => ...,
+     *      'value' => ...
+     *     )
+     *
      *   - Multiple Stubbing:
      *     - For the first method using the single stub
-     *     - For the rest of the methods: [className][instanceId][methodName][args]...[methodName][args]... = array('response' => array('action' => ..., 'value' => ...))
+     *     - For the rest of the methods:
+     *          [className][instanceId][methodName][args]...[methodName][args]... = array(
+     *              'response' => array('action' => ..., 'value' => ...)
+     *          )
      */
     private static $returnValues = [];
 
@@ -53,7 +60,10 @@ class ShortifyPunit
     /**
      * @var array of allowed friend classes, that could access private methods of this class
      */
-    private static $friendClasses = ['ShortifyPunit\Stub\WhenCase', 'ShortifyPunit\Mock\MockClassOnTheFly', 'ShortifyPunit\Stub\WhenChainCase'];
+    private static $friendClasses = [
+        'ShortifyPunit\Stub\WhenCase',
+        'ShortifyPunit\Mock\MockClassOnTheFly',
+        'ShortifyPunit\Stub\WhenChainCase'];
 
     /**
      * Call static function is used to detect calls to protected & private methods
@@ -82,7 +92,10 @@ class ShortifyPunit
         $callingClassName = $backTrace[2]['class'];
         
         $reflection = new \ReflectionClass($callingClassName);
-        if ($reflection->implementsInterface("{$namespace}\\Mock\\MockInterface") && is_array($arguments)) {
+
+        if ($reflection->implementsInterface("{$namespace}\\Mock\\MockInterface") &&
+            is_array($arguments)
+        ) {
             $arguments[0] = $callingClassName;
         }
 
@@ -112,7 +125,11 @@ class ShortifyPunit
     {
         $reflection = self::getMockReflection($mockedClass);
 
-        return static::mockClass($reflection, self::$namespace, self::$classBasePrefix);
+        return static::mockClass(
+            $reflection,
+            self::$namespace,
+            self::$classBasePrefix
+        );
     }
 
     /**
@@ -142,7 +159,12 @@ class ShortifyPunit
     {
         $reflection = self::getMockReflection($mockedClass);
 
-        return static::mockClass($reflection, self::$namespace, self::$classBasePrefix, MockTypes::PARTIAL);
+        return static::mockClass(
+            $reflection,
+            self::$namespace,
+            self::$classBasePrefix,
+            MockTypes::PARTIAL
+        );
     }
 
     /**
@@ -245,25 +267,40 @@ class ShortifyPunit
      * @param $args
      * @return null
      */
-    protected static function _createChainResponse($mockClassInstanceId, $mockClassType, $chainedMethodsBefore, $currentMethod, $args)
-    {
+    protected static function _createChainResponse(
+        $mockClassInstanceId,
+        $mockClassType,
+        $chainedMethodsBefore,
+        $currentMethod,
+        $args
+    ) {
 
         $currentMethodName = key($currentMethod);
-        $rReturnValues = &self::getMockHierarchyResponse($chainedMethodsBefore, $mockClassType, $mockClassInstanceId);
+        $rReturnValues = &self::getMockHierarchyResponse(
+            $chainedMethodsBefore,
+            $mockClassType,
+            $mockClassInstanceId
+        );
 
         // Check current method exist in return values chain
         $serializedArgs = serialize($args);
 
         if ( ! isset($rReturnValues[$currentMethodName][$serializedArgs]['response']))
         {
-            $serializedArgs = static::checkMatchingArguments($rReturnValues[$currentMethodName], $args);
+            $serializedArgs = static::checkMatchingArguments(
+                $rReturnValues[$currentMethodName],
+                $args
+            );
 
             if (is_null($serializedArgs)) {
                 return null;
             }
         }
 
-        return self::generateResponse($rReturnValues[$currentMethodName][$serializedArgs]['response'], $args);
+        return self::generateResponse(
+            $rReturnValues[$currentMethodName][$serializedArgs]['response'],
+            $args
+        );
     }
 
 
@@ -278,8 +315,14 @@ class ShortifyPunit
      * @param $action
      * @param $returns
      */
-    protected static function _setWhenMockResponse($className, $instanceId, $methodName, $args, $action, $returns)
-    {
+    protected static function _setWhenMockResponse(
+        $className,
+        $instanceId,
+        $methodName,
+        $args,
+        $action,
+        $returns
+    ) {
         $args = serialize($args);
 
         $returnValues = array();
@@ -338,7 +381,10 @@ class ShortifyPunit
         $firstChainedMethodName = key($response);
 
         if (isset(self::$returnValues[$firstChainedMethodName])) {
-            self::$returnValues[$firstChainedMethodName] = array_replace_recursive(self::$returnValues[$firstChainedMethodName],$response[$firstChainedMethodName]);
+            self::$returnValues[$firstChainedMethodName] = array_replace_recursive(
+                self::$returnValues[$firstChainedMethodName],
+                $response[$firstChainedMethodName]
+            );
         } else {
             self::$returnValues[$firstChainedMethodName] = $response[$firstChainedMethodName];
         }
@@ -380,13 +426,18 @@ class ShortifyPunit
     }
 
     /**
+     * Returns the mock hierarchy response values
+     *
      * @param $chainedMethodsBefore
      * @param $mockClassType
      * @param $mockClassInstanceId
      * @return mixed
      */
-    private static function &getMockHierarchyResponse($chainedMethodsBefore, $mockClassType, $mockClassInstanceId)
-    {
+    private static function &getMockHierarchyResponse(
+        $chainedMethodsBefore,
+        $mockClassType,
+        $mockClassInstanceId
+    ) {
         $rReturnValues = &self::$returnValues[$mockClassType][$mockClassInstanceId];
         // Check return values chain
         foreach ($chainedMethodsBefore as $chainedMethod) {

@@ -45,7 +45,14 @@ class WhenCase
      */
     public function setMethod($args, $action, $returns)
     {
-        ShortifyPunit::setWhenMockResponse($this->className, $this->instanceId, $this->method, $args, $action, $returns);
+        ShortifyPunit::setWhenMockResponse(
+            $this->className,
+            $this->instanceId,
+            $this->method,
+            $args,
+            $action,
+            $returns
+        );
     }
 
     public function __call($method, $args)
@@ -69,7 +76,11 @@ class WhenCase
         $value = array_pop($args);
 
         // set return / throw method
-        if ( ! in_array($method, array(MockAction::CALLBACK, MockAction::RETURNS, MockAction::CALLBACK))) {
+        if ( ! in_array($method, array(
+                MockAction::CALLBACK,
+                MockAction::RETURNS,
+                MockAction::CALLBACK))
+        ) {
             throw static::generateException("`{$method}` no such action!");
         }
 

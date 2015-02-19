@@ -10,7 +10,10 @@ trait ExceptionFactory
      */
     protected static function generateException($exceptionString)
     {
-        $exceptionClass = class_exists('\\PHPUnit_Framework_AssertionFailedError') ? '\\PHPUnit_Framework_AssertionFailedError' : '\\Exception';
+        $exceptionClass = class_exists('\\PHPUnit_Framework_AssertionFailedError') ?
+            '\\PHPUnit_Framework_AssertionFailedError' :
+            '\\Exception';
+
         return new $exceptionClass($exceptionString);
     }
 }
