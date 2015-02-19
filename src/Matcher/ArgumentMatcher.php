@@ -3,6 +3,8 @@
 namespace ShortifyPunit\Matcher;
 
 use Hamcrest\AssertionError;
+use Hamcrest\DiagnosingMatcher;
+use Hamcrest\Matcher;
 
 trait ArgumentMatcher
 {
@@ -38,7 +40,15 @@ trait ArgumentMatcher
                     }
 
                     // @throws Assertion error on failure
-                    assertThat($arg, $hamcrest[$index]);
+                    if ($hamcrest[$index] instanceof Matcher) {
+                        assertThat($arg, $hamcrest[$index]);
+
+                    } else {
+                        if ($arg != $hamcrest[$index]) {
+                            throw new AssertionError();
+                        }
+                    }
+
                 }
             }
             catch(AssertionError $e) {

@@ -36,7 +36,7 @@ class ShortifyPunit
     /**
      * @var string - Current namespace
      */
-    private static $namespace = '\\ShortifyPunit';
+    private static $namespace = '\ShortifyPunit';
 
     /**
      * @var array - return values of mocked functions by instance id
