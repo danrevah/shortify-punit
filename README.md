@@ -1,5 +1,5 @@
-#ShortifyPunit &nbsp; 
-[![Latest Stable Version](https://poser.pugx.org/danrevah/shortifypunit/v/stable.svg)](https://packagist.org/packages/danrevah/shortifypunit) [![Build Status](https://travis-ci.org/danrevah/ShortifyPunit.svg?branch=master)](https://travis-ci.org/danrevah/ShortifyPunit)  [![Coverage Status](https://coveralls.io/repos/danrevah/ShortifyPunit/badge.png?branch=master)](https://coveralls.io/repos/danrevah/ShortifyPunit/badge.png?branch=master) ![Code Quality](https://scrutinizer-ci.com/g/danrevah/ShortifyPunit/badges/quality-score.png?b=master) [![Total Downloads](https://poser.pugx.org/danrevah/shortifypunit/downloads.svg)](https://packagist.org/packages/danrevah/shortifypunit)
+#ShortifyPunit &nbsp;  [![Build Status](https://travis-ci.org/danrevah/ShortifyPunit.svg?branch=master)](https://travis-ci.org/danrevah/ShortifyPunit) 
+[![Latest Stable Version](https://poser.pugx.org/danrevah/shortifypunit/v/stable.svg)](https://packagist.org/packages/danrevah/shortifypunit)  [![Coverage Status](https://coveralls.io/repos/danrevah/ShortifyPunit/badge.png?branch=master)](https://coveralls.io/repos/danrevah/ShortifyPunit/badge.png?branch=master) ![Code Quality](https://scrutinizer-ci.com/g/danrevah/ShortifyPunit/badges/quality-score.png?b=master) [![Total Downloads](https://poser.pugx.org/danrevah/shortifypunit/downloads.svg)](https://packagist.org/packages/danrevah/shortifypunit)
 
 > PHP Mocking Framework, 
 > inspired by Mockito library for Java
