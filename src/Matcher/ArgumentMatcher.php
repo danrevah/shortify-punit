@@ -43,10 +43,8 @@ trait ArgumentMatcher
                     if ($hamcrest[$index] instanceof Matcher) {
                         assertThat($arg, $hamcrest[$index]);
 
-                    } else {
-                        if ($arg != $hamcrest[$index]) {
-                            throw new AssertionError();
-                        }
+                    } else if ($arg != $hamcrest[$index]) {
+                        throw new AssertionError();
                     }
 
                 }

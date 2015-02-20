@@ -387,4 +387,19 @@ class ShortifyPunitTest extends \PHPUnit_Framework_TestCase
         // after chaning methods in chain with same arguments are instanceof `MockClassOnTheFly`
         $this->assertInstanceOf('ShortifyPunit\Mock\MockClassOnTheFly', $spy->second_method());
     }
+
+    /**
+     * Hamcrest API with normal parameters caused problems
+     * Bug Fix in - v1.0.6
+     */
+    public function testHamcrestWithNormalParam()
+    {
+        $mock = ShortifyPunit::mock('SimpleClassForMocking');
+
+        ShortifyPunit::when($mock)->first_method(anything(), 'a')->returns(1);
+        ShortifyPunit::when($mock)->first_method(anything(), 'b')->returns(2);
+
+        $this->assertEquals($mock->first_method('anything...', 'a'), 1);
+        $this->assertEquals($mock->first_method('anything...', 'b'), 2);
+    }
 }
