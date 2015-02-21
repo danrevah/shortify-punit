@@ -4,6 +4,8 @@
 > PHP Mocking Framework, 
 > inspired by Mockito library for Java
 
+## Table of contents
+
  * [Installation](#installation)
  * [Mocking](#mocking-examples)
  * [Stubbing](#stubbing)
