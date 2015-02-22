@@ -61,6 +61,7 @@ class ShortifyPunit
      * @var array of allowed friend classes, that could access private methods of this class
      */
     private static $friendClasses = [
+        'ShortifyPunit\ShortifyPunit',
         'ShortifyPunit\Stub\WhenCase',
         'ShortifyPunit\Mock\MockClassOnTheFly',
         'ShortifyPunit\Stub\WhenChainCase'];
