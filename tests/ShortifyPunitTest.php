@@ -39,7 +39,22 @@ final class FinalClassForMocking
 
 interface InterfaceTest
 {
+}
 
+/**
+ * Class MagicClass
+ */
+class MagicClass
+{
+    public function __call($method, $arguments)
+    {
+        return '__call';
+    }
+
+    public function __toString()
+    {
+        return '__toString';
+    }
 }
 
 class ShortifyPunitTest extends \PHPUnit_Framework_TestCase
@@ -401,5 +416,18 @@ class ShortifyPunitTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals($mock->first_method('anything...', 'a'), 1);
         $this->assertEquals($mock->first_method('anything...', 'b'), 2);
+    }
+
+    /**
+     * Stubbing magic methods
+     */
+    public function testStubbingMagicMethods()
+    {
+        $mock = ShortifyPunit::mock('MagicClass');
+
+        ShortifyPunit::when($mock)->__toString()->returns('mockString');
+
+        $this->assertEquals($mock->__toString(), 'mockString');
+        $this->assertEquals($mock, 'mockString');
     }
 }
