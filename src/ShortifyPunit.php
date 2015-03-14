@@ -134,29 +134,29 @@ class ShortifyPunit
     }
 
     /**
-     * Partial Mocking interfaces|classes
+     * Partial Mocking interfaces & classes
      *
      * @desc Partial mock is not stubbing any function by default (to NULL) like in regular mock()
      *
      * Examples:
-     *      // class to partial mock / spy
+     *      // class to partial mock
      *      class Foo {
      *        function bar() { return 'bar'; }
      *      }
      *
      *      $mock = ShortifyPunit::mock('Foo');
-     *      $spy = ShortifyPunit::spy('Foo');
+     *      $partialMock = ShortifyPunit::partialMock('Foo');
      *
      *      $mock->bar(); // returns NULL
-     *      echo $spy->bar(); // prints 'bar'
+     *      echo $partialMock->bar(); // prints 'bar'
      *
-     *      ShortifyPunit::when($spy)->bar()->returns('foo'); // stubbing spy
-     *      echo $spy->bar(); // prints 'foo'
+     *      ShortifyPunit::when($partialMock)->bar()->returns('foo'); // stubbing partial mock
+     *      echo $partialMock->bar(); // prints 'foo'
      *
      * @param $mockedClass
      * @return mixed
      */
-    public static function spy($mockedClass)
+    public static function partialMock($mockedClass)
     {
         $reflection = self::getMockReflection($mockedClass);
 
@@ -166,6 +166,14 @@ class ShortifyPunit
             self::$classBasePrefix,
             MockTypes::PARTIAL
         );
+    }
+
+    /**
+     * @deprecated use partialMock($mockedClass) instead
+     */
+    public static function spy($mockedClass)
+    {
+        return self::partialMock($mockedClass);
     }
 
     /**

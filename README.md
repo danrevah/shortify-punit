@@ -9,7 +9,7 @@
  * [Installation](#installation)
  * [Mocking](#mocking-examples)
  * [Stubbing](#stubbing)
- * [Spies](#spies)
+ * [Partial Mock](#partial-mock)
  * [Stubbing Method Chaining](#stubbing-method-chaining)
  * [Verifying](#verifying)
  * [Argument Matcher](#argument-matcher)
@@ -66,9 +66,9 @@ Methods:
 * `returns($response)` - Returns a $response
 * `callback(function() { /*...*/ })` - Calling a callback
 
-## Spies
+## Partial Mock
 
-Spies are a partial mock, sometimes you need some of the methods to behave normally except for the one method that you need to test. That so called partial mocking can be done using the spy method
+sometimes you need some of the methods to behave normally except for the one method that you need to test. That so called partial mocking can be done using the partialMock method
 
 ```php
 class Foo {
@@ -76,13 +76,13 @@ class Foo {
 }
 
 $mock = ShortifyPunit::mock('Foo');
-$spy = ShortifyPunit::spy('Foo');
+$partialMock = ShortifyPunit::partialMock('Foo');
 
 $mock->bar(); // returns NULL
-echo $spy->bar(); // prints 'bar'
+echo $partialMock->bar(); // prints 'bar'
 
-ShortifyPunit::when($spy)->bar()->returns('foo'); // stubbing spy
-echo $spy->bar(); // prints 'foo'
+ShortifyPunit::when($partialMock)->bar()->returns('foo'); // stubbing partialMock
+echo $partialMock->bar(); // prints 'foo'
 ```
 
 ## Stubbing Method Chaining

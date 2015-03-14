@@ -345,10 +345,10 @@ class ShortifyPunitTest extends \PHPUnit_Framework_TestCase
      */
     public function testMultipleClassMocking()
     {
-        $mockSimple1 = ShortifyPunit::spy('SimpleClassForMocking');
-        $mockSimple2 = ShortifyPunit::spy('SimpleClassForMocking');
-        $mockFoo1 = ShortifyPunit::spy('Foo');
-        $mockFoo2 = ShortifyPunit::spy('Foo');
+        $mockSimple1 = ShortifyPunit::partialMock('SimpleClassForMocking');
+        $mockSimple2 = ShortifyPunit::partialMock('SimpleClassForMocking');
+        $mockFoo1 = ShortifyPunit::partialMock('Foo');
+        $mockFoo2 = ShortifyPunit::partialMock('Foo');
 
         ShortifyPunit::when($mockSimple1)->first_method(1)->returns(1);
         ShortifyPunit::when($mockSimple2)->first_method(1)->returns(2);
@@ -366,7 +366,7 @@ class ShortifyPunitTest extends \PHPUnit_Framework_TestCase
      */
     public function testSpies()
     {
-        $spy = ShortifyPunit::spy('SimpleClassForMocking');
+        $spy = ShortifyPunit::partialMock('SimpleClassForMocking');
 
         $this->assertEquals($spy->first_method(), 1); // default value
         $this->assertEquals($spy->second_method(), 2); // default value
