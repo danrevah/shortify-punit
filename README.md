@@ -68,7 +68,7 @@ Methods:
 
 ## Partial Mock
 
-sometimes you need some of the methods to behave normally except for the one method that you need to test. That so called partial mocking can be done using the partialMock method
+partial mock is used when you need some of the methods to behave normally except from that one method you need to test. that can be done with partial mock, it keeps the logic unless you stub the method.
 
 ```php
 class Foo {
