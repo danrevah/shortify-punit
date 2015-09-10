@@ -20,8 +20,6 @@
 The following instructions outline installation using Composer. If you don't
 have Composer, you can download it from [http://getcomposer.org/](http://getcomposer.org/)
 
- * Run either of the following commands, depending on your environment:
-
 ```
 $ composer require "danrevah/shortifypunit":"dev-master" 
 $ php composer.phar require "danrevah/shortifypunit":"dev-master"
