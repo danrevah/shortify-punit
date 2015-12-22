@@ -120,6 +120,8 @@ Once created, mock will remember all invocations. Then you can selectively verif
     ShortifyPunit::verify($mock)->first_method()->neverCalled(); // returns FALSE
     ShortifyPunit::verify($mock)->first_method()->atLeast(2); // returns TRUE
     ShortifyPunit::verify($mock)->first_method()->calledTimes(2); // returns TRUE
+    
+    ShortifyPunit::verify($mock)->first_method()->resetCounter(); //No return values
 ```
 
 Methods:
@@ -128,6 +130,7 @@ Methods:
 * `calledTimes($times)` - Verify called exactly $times
 * `neverCalled()` - Alias of calledTimes(0)
 * `lessThan($times)` - Verify called less than $times
+* `resetCounter()` - Reset the counter to 0
 
 ## Argument Matcher
 

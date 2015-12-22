@@ -141,4 +141,27 @@ class VerifyTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse(ShortifyPunit::verify($mock)->bar(1)->foo(2)->calledTimes(2));
         $this->assertFalse(ShortifyPunit::verify($mock)->bar(1)->foo(2)->lessThan(1));
     }
-} 
+
+    /**
+     * Testing the reset counter
+     */
+    public function testResetCounter()
+    {
+        $mock = ShortifyPunit::mock('Foo');
+
+        ShortifyPunit::when($mock)->bar()->returns(1);
+
+        $mock->bar();
+
+        $this->assertTrue(ShortifyPunit::verify($mock)->bar()->atLeast(1));
+        $this->assertTrue(ShortifyPunit::verify($mock)->bar()->calledTimes(1));
+        $this->assertTrue(ShortifyPunit::verify($mock)->bar()->lessThan(2));
+
+        ShortifyPunit::verify($mock)->bar()->resetCounter();
+        $mock->bar();
+
+        $this->assertTrue(ShortifyPunit::verify($mock)->bar()->atLeast(1));
+        $this->assertTrue(ShortifyPunit::verify($mock)->bar()->calledTimes(1));
+        $this->assertTrue(ShortifyPunit::verify($mock)->bar()->lessThan(2));
+    }
+}

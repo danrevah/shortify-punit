@@ -149,4 +149,50 @@ class Verify
 
         return isset($mockResponse['response']['counter']) ? $mockResponse['response']['counter'] : 0;
     }
+    
+    /**
+     * reset counter to 0
+     *
+     * @return bool
+     */
+    public function resetCounter()
+    {
+        self::doResetCounter($this->methods);
+
+    }
+
+
+    function doResetCounter($methods) {
+        
+        $mockReturnValues = ShortifyPunit::getReturnValues();
+
+        $mockResponse = $mockReturnValues[$this->mockedClass][$this->instanceId];
+
+        foreach ($methods as $method)
+        {
+            $methodName = key($method);
+            $args = $method[$methodName];
+            $serializedArgs = serialize($args);
+
+            if ( ! isset($mockResponse[$methodName][$serializedArgs]))
+            {
+                if ( ! isset($mockResponse[$methodName])) {
+                    break;
+                }
+
+                // try to finding matching Hamcrest-API Function (anything(), equalTo())
+                $serializedArgs = static::checkMatchingArguments($mockResponse[$methodName], $args);
+
+                if (is_null($serializedArgs)) {
+                    break;
+                }
+            }
+            if ( isset($mockResponse[$methodName][$serializedArgs]['response'] ['counter'])) {
+                $mockReturnValues[$this->mockedClass][$this->instanceId][$methodName][$serializedArgs]['response'] ['counter'] = 0;
+            }
+        }
+
+        ShortifyPunit::setReturnValues($mockReturnValues);
+    }
+    
 } 
