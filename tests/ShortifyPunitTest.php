@@ -92,15 +92,6 @@ class ShortifyPunitTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @checks Friend classes
-     * @expectedException \PHPUnit_Framework_AssertionFailedError
-     */
-    public function testFriendClasses()
-    {
-        ShortifyPunit::generateInstanceId();
-    }
-
-    /**
      * @checks Private method exist
      * @expectedException \PHPUnit_Framework_AssertionFailedError
      */

@@ -56,22 +56,8 @@ class ShortifyPunit
      */
     private static $returnValues = [];
 
-
-    /**
-     * @var array of allowed friend classes, that could access private methods of this class
-     */
-    private static $friendClasses = [
-        'ShortifyPunit\ShortifyPunit',
-        'ShortifyPunit\Stub\WhenCase',
-        'ShortifyPunit\Mock\MockClassOnTheFly',
-        'ShortifyPunit\Stub\WhenChainCase'];
-
     /**
      * Call static function is used to detect calls to protected & private methods
-     * only friend classes are allowed to call private methods (C++ Style)
-     *
-     * + Friend Classes are those who Implement the mocking interface (ShortifyPunitMockInterface)
-     *   or is set in $friendClasses variable
      *
      * @param $name
      * @param $arguments
@@ -86,22 +72,6 @@ class ShortifyPunit
 
         if ( ! method_exists($class, $name)) {
             throw self::generateException("{$class} has no such method!");
-        }
-
-        $namespace = self::$namespace;
-        $backTrace = debug_backtrace();
-        $callingClassName = $backTrace[2]['class'];
-        
-        $reflection = new \ReflectionClass($callingClassName);
-
-        if ($reflection->implementsInterface("{$namespace}\\Mock\\MockInterface") &&
-            is_array($arguments)
-        ) {
-            $arguments[0] = $callingClassName;
-        }
-
-        if ( ! self::isFriendClass($callingClassName, $namespace)){
-            throw self::generateException("{$class} is not a friend class!");
         }
 
         return forward_static_call_array('static::'.$name, $arguments);
@@ -267,7 +237,7 @@ class ShortifyPunit
     }
 
     /**
-     * Setting up a chained mock response, function is called from mocked classes using `friend classes` style
+     * Setting up a chained mock response, function is called from mocked classes
      *
      * @param $mockClassInstanceId
      * @param $mockClassType
@@ -315,7 +285,7 @@ class ShortifyPunit
 
 
     /**
-     * Setting up a mock response, function is called from mocked classes using `friend classes` style
+     * Setting up a mock response, function is called from mocked classes
      *
      * @param $className
      * @param $instanceId
@@ -341,7 +311,7 @@ class ShortifyPunit
     }
 
     /**
-     * Generating instance id, function is called from mocked classes using `friend classes` style
+     * Generating instance id, function is called from mocked classes
      * @return int
      */
     protected static function _generateInstanceId()
@@ -350,7 +320,7 @@ class ShortifyPunit
     }
 
     /**
-     * Create response is a private method which is called from the Mocked classes using `friend classes` style
+     * Create response is a private method which is called from the Mocked classes
      * returns a value which was set before in the When() function otherwise returning NULL
      *
      * @param $className
@@ -415,23 +385,6 @@ class ShortifyPunit
             throw self::generateException("Unable to mock class {$mockedClass} declared as final");
         }
         return $reflection;
-    }
-
-    /**
-     * @param $callingClassName
-     * @param string $namespace
-     * @return bool
-     */
-    private static function isFriendClass($callingClassName, $namespace)
-    {
-        $reflection = new \ReflectionClass($callingClassName);
-
-        if ( ! $reflection->implementsInterface("{$namespace}\\Mock\\MockInterface") &&
-             ! in_array($callingClassName, self::$friendClasses)) {
-            return false;
-        }
-
-        return true;
     }
 
     /**

@@ -141,4 +141,4 @@ class VerifyTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse(ShortifyPunit::verify($mock)->bar(1)->foo(2)->calledTimes(2));
         $this->assertFalse(ShortifyPunit::verify($mock)->bar(1)->foo(2)->lessThan(1));
     }
-} 
+}
