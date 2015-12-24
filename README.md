@@ -17,7 +17,7 @@
 
 ## Installation
 
-> PHP Version >= 5.4 is required! 
+> PHP Version >= 5.4 is required!
 
 The following instructions outline installation using Composer. If you don't
 have Composer, you can download it from [http://getcomposer.org/](http://getcomposer.org/)

@@ -48,6 +48,47 @@ class VerifyTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * Secondary stub should reset call counter
+     */
+    public function testVerifyResetCounterOnMock()
+    {
+        // First stub
+        $mock = ShortifyPunit::mock('Foo');
+        ShortifyPunit::when($mock)->bar()->foo()->returns(1);
+        $mock->bar()->foo();
+        $this->assertTrue(ShortifyPunit::verify($mock)->bar()->foo()->atLeast(1));
+
+        // Secondary stub should reset counter
+        ShortifyPunit::when($mock)->bar()->foo()->returns(1);
+        $this->assertTrue(ShortifyPunit::verify($mock)->bar()->foo()->calledTimes(0));
+    }
+
+    /**
+     * Testing secondary stub is not effecting child elements
+     */
+    public function testSecondaryStubNotCausingIssues()
+    {
+        $mock = ShortifyPunit::mock('Foo');
+        ShortifyPunit::when($mock)->bar()->foo()->returns(1);
+        ShortifyPunit::when($mock)->bar(1)->foo()->returns(2);
+        ShortifyPunit::when($mock)->bar()->foo(2)->returns(3);
+
+        $this->assertEquals($mock->bar()->foo(), 1);
+        $this->assertEquals($mock->bar(1)->foo(), 2);
+        $this->assertEquals($mock->bar()->foo(2), 3);
+
+        $this->assertTrue(ShortifyPunit::verify($mock)->bar()->foo()->calledTimes(1));
+        $this->assertTrue(ShortifyPunit::verify($mock)->bar(1)->foo()->calledTimes(1));
+        $this->assertTrue(ShortifyPunit::verify($mock)->bar()->foo(2)->calledTimes(1));
+
+        ShortifyPunit::when($mock)->bar()->foo()->returns(1);
+
+        $this->assertTrue(ShortifyPunit::verify($mock)->bar()->foo()->calledTimes(0));
+        $this->assertTrue(ShortifyPunit::verify($mock)->bar(1)->foo()->calledTimes(1));
+        $this->assertTrue(ShortifyPunit::verify($mock)->bar()->foo(2)->calledTimes(1));
+    }
+
+    /**
      * Basic single stubbing
      */
     public function testVerifySingleStub()

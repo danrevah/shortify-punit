@@ -147,7 +147,7 @@ class WhenChainCase
             $rResponse = &$rResponse[$chainedMethodName][$serializedChainedMethodArgs];
         }
 
-        $rResponse[$currentMethodName][serialize(current($currentMethod))] = ['response' => ['action' => $action, 'value' => $lastValue]];
+        $rResponse[$currentMethodName][serialize(current($currentMethod))] = ['response' => ['action' => $action, 'value' => $lastValue, 'counter' => 0]];
 
         ShortifyPunit::addChainedResponse(array(get_class($this->mockClass) => [$mockClassInstanceId => $response]));
     }
