@@ -305,7 +305,7 @@ class ShortifyPunitTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($mock->first_method()->second_method(1), 1);
         $this->assertEquals($mock->first_method()->second_method(array()), 1);
         $this->assertNull($mock->first_method('foo'));
-        $this->assertNull($mock->first_method()->second_method('foo bar', new Exception()));
+        $this->assertNull($mock->first_method()->second_method('foo bar', new \Exception()));
 
         $this->assertEquals($mock->first_method(1)->second_method(1), 2);
         $this->assertNull($mock->first_method(1)->second_method('bar'));
@@ -315,7 +315,7 @@ class ShortifyPunitTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals($mock->first_method(3)->second_method('foo bar', $mock), 4);
         $this->assertNull($mock->first_method(3)->second_method('foo', $mock));
-        $this->assertNull($mock->first_method(3)->second_method('foo bar', new Exception()));
+        $this->assertNull($mock->first_method(3)->second_method('foo bar', new \Exception()));
 
         $this->assertEquals($mock->first_method(4)->second_method(1), 5);
 
